@@ -265,10 +265,9 @@
       <div class="section-heading">Interactive correlation plot</div>
       <p class="section-lead">Hover points to see paired sim/real success; higher correlation with co-training.</p>
       <svg id="corr-scatter" viewBox="0 0 520 320" role="img" aria-label="Simulation vs Real success scatter"></svg>
-      <div class="scatter-legend">
-        <span class="dot sim">PolaRiS (co-trained)</span>
-        <span class="dot base">Baseline sim</span>
-      </div>
+      <div class="scatter-status" id="scatter-status">Loading results…</div>
+      <div class="scatter-legend" id="policy-legend"></div>
+      <div class="scatter-legend" id="env-legend"></div>
       <div class="rank-lists">
         <div>
           <div class="rank-title">Real-world ranking</div>
@@ -396,29 +395,14 @@
       setMesh(select?.value || 'cleaner');
     });
 
-    // Simple interactive scatter with randomized demo points
+    // Simple interactive scatter backed by exported data (PolaRiS vs LIBERO)
     document.addEventListener('DOMContentLoaded', () => {
       const svg = document.getElementById('corr-scatter');
+      const statusEl = document.getElementById('scatter-status');
+      const policyLegend = document.getElementById('policy-legend');
+      const envLegend = document.getElementById('env-legend');
       if (!svg) return;
 
-      const makeData = () => {
-        // Sim-correlated cluster (PolaRiS) near diagonal
-        const correlated = ['π0.5', 'π0', 'PaliGemma'].map((name) => {
-          const sim = 0.65 + Math.random() * 0.25; // 0.65-0.9
-          const real = sim - 0.05 + Math.random() * 0.1; // close to sim
-          return { name, sim: Number(sim.toFixed(2)), real: Number(real.toFixed(2)), type: 'sim' };
-        });
-        // Baseline cluster with weaker correlation
-        const baselineNames = ['Baseline A', 'Baseline B', 'Baseline C', 'Baseline D'];
-        const baseline = baselineNames.map((name) => {
-          const sim = 0.4 + Math.random() * 0.3; // 0.4-0.7
-          const real = 0.2 + Math.random() * 0.25; // weaker mapping
-          return { name, sim: Number(sim.toFixed(2)), real: Number(real.toFixed(2)), type: 'base' };
-        });
-        return [...correlated, ...baseline];
-      };
-
-      const data = makeData();
       const margin = { top: 20, right: 20, bottom: 40, left: 50 };
       const width = 520 - margin.left - margin.right;
       const height = 320 - margin.top - margin.bottom;
@@ -431,56 +415,231 @@
         return el;
       };
 
-      // Clear
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      const renderScatter = (data) => {
+        // Clear
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-      const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
-      svg.appendChild(g);
+        const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
+        svg.appendChild(g);
 
-      const scaleX = (v) => (v - min) / (max - min) * width;
-      const scaleY = (v) => height - (v - min) / (max - min) * height;
+        const scaleX = (v) => (v - min) / (max - min) * width;
+        const scaleY = (v) => height - (v - min) / (max - min) * height;
 
-      // Axes lines
-      g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#999', 'stroke-width': 1 }));
-      g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#999', 'stroke-width': 1 }));
+        // Grid lines
+        const gridCount = 5;
+        for (let i = 1; i < gridCount; i++) {
+          const gx = (i / gridCount) * width;
+          const gy = (i / gridCount) * height;
+          g.appendChild(createEl('line', { x1: gx, y1: 0, x2: gx, y2: height, stroke: '#e0e0e0', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
+          g.appendChild(createEl('line', { x1: 0, y1: gy, x2: width, y2: gy, stroke: '#e0e0e0', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
+        }
 
-      // Axis labels
-      const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#444', 'font-size': '12' });
-      xLabel.textContent = 'Simulation Success Rate';
-      g.appendChild(xLabel);
-      const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#444', 'font-size': '12', transform: `rotate(-90 -36 ${height / 2})` });
-      yLabel.textContent = 'Real-World Success Rate';
-      g.appendChild(yLabel);
+        // Axes lines
+        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#333', 'stroke-width': 2 }));
+        g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#333', 'stroke-width': 2 }));
 
-      // Diagonal reference
-      g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: '#ccc', 'stroke-dasharray': '4 3' }));
+        // Axis labels
+        const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#333', 'font-size': '12', 'font-weight': '600' });
+        xLabel.textContent = 'Simulation Success Rate';
+        g.appendChild(xLabel);
+        const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#333', 'font-size': '12', 'font-weight': '600', transform: `rotate(-90 -36 ${height / 2})` });
+        yLabel.textContent = 'Real-World Success Rate';
+        g.appendChild(yLabel);
 
-      // Tooltip
-      const tooltip = document.createElement('div');
-      tooltip.className = 'scatter-tooltip';
-      document.body.appendChild(tooltip);
+        // Diagonal reference
+        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: '#999', 'stroke-dasharray': '6 4', 'stroke-width': 2, 'stroke-opacity': 0.6 }));
 
-      const color = (d) => (d.type === 'sim' ? '#0f6a34' : '#9a1f1f');
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'scatter-tooltip';
+        document.body.appendChild(tooltip);
 
-      data.forEach((d) => {
-        const cx = scaleX(d.sim);
-        const cy = scaleY(d.real);
-        const node = createEl('circle', { cx, cy, r: 6, fill: color(d), 'fill-opacity': 0.9 });
-        node.addEventListener('mouseenter', (e) => {
-          tooltip.style.opacity = '1';
-          tooltip.textContent = `${d.name}: sim ${d.sim}, real ${d.real}`;
-          tooltip.style.left = `${e.pageX + 10}px`;
-          tooltip.style.top = `${e.pageY + 10}px`;
+        const polarisEnvPalette = ['#41245f', '#8326df', '#b392e0'];
+        const liberoEnvPalette = ['#966f1a', '#c28426', '#E0AF67'];
+        const policyMarkerPool = ['circle', 'square', 'triangle', 'diamond', 'circle'];
+        const policyShapeMap = {};
+
+        // Stable shapes per policy (matches superplot idea: fixed shape per policy)
+        const uniquePolicies = Array.from(new Set(data.map((d) => d.policy || d.name)));
+        uniquePolicies.forEach((pol, idx) => {
+          policyShapeMap[pol] = policyMarkerPool[idx % policyMarkerPool.length];
         });
-        node.addEventListener('mouseleave', () => {
-          tooltip.style.opacity = '0';
+
+        const envColor = (env, source) => {
+          if (!env) return source === 'polaris' ? '#1f3c8f' : 'rgba(160,165,175,0.9)';
+          const palette = source === 'polaris' ? polarisEnvPalette : liberoEnvPalette;
+          const idx = Math.abs(env.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length;
+          return palette[idx];
+        };
+        const strokeColor = (source) => (source === 'polaris' ? '#12306c' : 'rgba(130,135,145,0.9)');
+        const markerForPolicy = (policy) => policyShapeMap[policy] || 'circle';
+
+        data.forEach((d) => {
+          const cx = scaleX(d.sim);
+          const cy = scaleY(d.real);
+          const fill = envColor(d.environment || '', d.source);
+          const stroke = strokeColor(d.source);
+          const marker = markerForPolicy(d.policy || d.name);
+          let node;
+          const baseFillOpacity = d.source === 'polaris' ? 0.9 : 0.6;
+          const baseStrokeWidth = 1.5;
+          const baseSquare = 10;
+          const baseCircle = 6;
+          const baseTri = 12;
+          const baseDiamond = 10;
+          if (marker === 'square') {
+            const s = baseSquare;
+            node = createEl('rect', {
+              x: cx - s / 2,
+              y: cy - s / 2,
+              width: s,
+              height: s,
+              rx: 2,
+              fill,
+              'fill-opacity': baseFillOpacity,
+              stroke,
+              'stroke-width': baseStrokeWidth
+            });
+          } else if (marker === 'triangle') {
+            const h = baseTri;
+            const points = [
+              `${cx},${cy - h}`,
+              `${cx - h},${cy + h * 0.8}`,
+              `${cx + h},${cy + h * 0.8}`
+            ].join(' ');
+            node = createEl('polygon', {
+              points,
+              fill,
+              'fill-opacity': baseFillOpacity,
+              stroke,
+              'stroke-width': baseStrokeWidth
+            });
+          } else if (marker === 'diamond') {
+            const h = baseDiamond;
+            const points = [
+              `${cx},${cy - h}`,
+              `${cx - h},${cy}`,
+              `${cx},${cy + h}`,
+              `${cx + h},${cy}`
+            ].join(' ');
+            node = createEl('polygon', {
+              points,
+              fill,
+              'fill-opacity': baseFillOpacity,
+              stroke,
+              'stroke-width': baseStrokeWidth
+            });
+          } else {
+            // circle / default
+            node = createEl('circle', {
+              cx,
+              cy,
+              r: baseCircle,
+              fill,
+              'fill-opacity': baseFillOpacity,
+              stroke,
+              'stroke-width': baseStrokeWidth
+            });
+          }
+          node.addEventListener('mouseenter', (e) => {
+            tooltip.style.opacity = '1';
+            tooltip.textContent = `${d.policy || d.name}: Sim ${Math.round(d.sim * 100)}%, Real ${Math.round(d.real * 100)}%${d.environment ? ` | Env: ${d.environment}` : ''}`;
+            tooltip.style.left = `${e.pageX + 10}px`;
+            tooltip.style.top = `${e.pageY + 10}px`;
+          });
+          node.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+          });
+          node.addEventListener('mousemove', (e) => {
+            tooltip.style.left = `${e.pageX + 10}px`;
+            tooltip.style.top = `${e.pageY + 10}px`;
+          });
+          g.appendChild(node);
         });
-        node.addEventListener('mousemove', (e) => {
-          tooltip.style.left = `${e.pageX + 10}px`;
-          tooltip.style.top = `${e.pageY + 10}px`;
+
+        // Legends
+        if (policyLegend) {
+          policyLegend.innerHTML = '';
+          const legendColor = '#41245f';
+          uniquePolicies.forEach((pol) => {
+            const shape = markerForPolicy(pol);
+            const item = document.createElement('span');
+            item.className = 'legend-item';
+            const shapeEl = document.createElement('span');
+            shapeEl.className = `legend-shape ${shape}`;
+            shapeEl.style.background = shape === 'triangle' ? 'transparent' : legendColor;
+            if (shape === 'triangle') shapeEl.style.borderBottomColor = legendColor;
+            shapeEl.style.borderColor = legendColor;
+            item.appendChild(shapeEl);
+            item.append(pol);
+            policyLegend.appendChild(item);
+          });
+        }
+        if (envLegend) {
+          envLegend.innerHTML = '';
+          const polEnv = Array.from(new Set(data.filter((d) => d.source === 'polaris').map((d) => d.environment || ''))).filter(Boolean);
+          const libEnv = Array.from(new Set(data.filter((d) => d.source === 'libero').map((d) => d.environment || ''))).filter(Boolean);
+          polEnv.forEach((env) => {
+            const item = document.createElement('span');
+            item.className = 'legend-item';
+            const shapeEl = document.createElement('span');
+            shapeEl.className = 'legend-shape square';
+            shapeEl.style.background = envColor(env, 'polaris');
+            shapeEl.style.borderColor = '#12306c';
+            item.appendChild(shapeEl);
+            item.append(env);
+            envLegend.appendChild(item);
+          });
+          libEnv.forEach((env) => {
+            const item = document.createElement('span');
+            item.className = 'legend-item';
+            const shapeEl = document.createElement('span');
+            shapeEl.className = 'legend-shape circle';
+            shapeEl.style.background = envColor(env, 'libero');
+            shapeEl.style.borderColor = 'rgba(130,135,145,0.9)';
+            item.appendChild(shapeEl);
+            item.append(env);
+            envLegend.appendChild(item);
+          });
+        }
+      };
+
+      fetch('./assets/data/correlation.json')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((records) => {
+          if (!Array.isArray(records) || records.length === 0) {
+            if (statusEl) statusEl.textContent = 'No correlation data available.';
+            return;
+          }
+          // Normalize fields
+          const data = records.map((r, idx) => ({
+            name: r.name || r.policy || `pt-${idx + 1}`,
+            policy: r.policy || '',
+            environment: r.environment || '',
+            sim: Number(r.sim),
+            real: Number(r.real),
+            source: r.source || 'polaris'
+          }));
+          renderScatter(data);
+          if (statusEl) statusEl.textContent = '';
+        })
+        .catch((err) => {
+          console.warn('Correlation data load failed; showing demo data', err);
+          if (statusEl) statusEl.textContent = 'Showing demo points (data file missing).';
+          const demo = [];
+          for (let i = 0; i < 10; i++) {
+            const sim = 0.6 + Math.random() * 0.3;
+            const real = Math.min(1, Math.max(0, sim + (Math.random() * 0.1 - 0.05)));
+            demo.push({ name: `POLARIS ${i + 1}`, sim, real, source: 'polaris' });
+          }
+          for (let i = 0; i < 10; i++) {
+            demo.push({ name: `LIBERO ${i + 1}`, sim: Math.random(), real: Math.random(), source: 'libero' });
+          }
+          renderScatter(demo);
         });
-        g.appendChild(node);
-      });
     });
   </script>
 </body>

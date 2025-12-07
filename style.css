@@ -1385,6 +1385,48 @@ video.r2s-video-item {
   color: #444;
 }
 
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-shape {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-radius: 0;
+}
+
+.legend-shape.square.blue {
+  background: #1f3c8f;
+  border-color: #12306c;
+  border-radius: 2px;
+}
+
+.legend-shape.circle.gray {
+  background: rgba(160,165,175,0.9);
+  border-color: rgba(130,135,145,0.9);
+  border-radius: 50%;
+}
+
+.legend-shape.square {
+  border-radius: 2px;
+}
+.legend-shape.circle {
+  border-radius: 50%;
+}
+.legend-shape.triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 10px solid #1f3c8f;
+  border-radius: 0;
+  border: none;
+}
+
 .scatter-legend .dot::before {
   content: '';
   display: inline-block;
@@ -1400,6 +1442,13 @@ video.r2s-video-item {
 
 .scatter-legend .dot.base::before {
   background: #9a1f1f;
+}
+
+.scatter-status {
+  margin-top: 8px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  color: #555;
 }
 
 .rank-lists {
