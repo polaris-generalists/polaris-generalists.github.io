@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolaRiS</title>
+  <link rel="icon" href="./figs/logo.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="top-nav">
+    <div class="nav-brand">PolaRiS</div>
+    <div class="nav-links">
+      <a href="#slider-comparison">Real vs Sim</a>
+      <a href="#abstract">TL;DR</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#co-training">Co-training</a>
+      <a href="#results">Results</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+    <div class="nav-actions">
+      <a class="nav-btn primary" href="./VideoMimic.pdf" target="_blank">Paper</a>
+      <a class="nav-btn" href="https://github.com/hongsukchoi/VideoMimic" target="_blank">Code</a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="hero-flow">
+      <div class="hero-text">PolaRiS</div>
+      <div class="sub-hero-text">Scalable Real-to-Sim Evaluations for Generalist Robot Policies</div>
+
+      <div class="hero-pill-row">
+        <span class="hero-pill">Real to Sim Reconstruction</span>
+        <span class="hero-pill">Simulation Co-training</span>
+        <span class="hero-pill">Zero-shot Evaluation</span>
+      </div>
+
+      <div class="authors">
+        <a href="https://allshire.org/" target="_blank">Arthur Allshire*</a>, <a href="https://hongsukchoi.github.io/" target="_blank">Hongsuk Choi*</a>, <a href="https://www.junyi42.com/" target="_blank">Junyi Zhang*</a>, <a href="https://mcallisterdavid.com/" target="_blank">David McAllister*</a>, <a href="https://antoniomacaronio.github.io/personal-website/#/home/" target="_blank">Anthony Zhang</a>, <a href="https://chungmin99.github.io/" target="_blank">Chung Min Kim</a>,<br>
+        <a href="https://people.eecs.berkeley.edu/~trevor/" target="_blank">Trevor Darrell</a>, <a href="https://people.eecs.berkeley.edu/~pabbeel/" target="_blank">Pieter Abbeel</a>, <a href="https://people.eecs.berkeley.edu/~malik/" target="_blank">Jitendra Malik</a>, <a href="https://people.eecs.berkeley.edu/~kanazawa/" target="_blank">Angjoo Kanazawa</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*:equal contribution)
+        <span class="affiliation">University of California, Berkeley</span>
+      </div>
+
+      <div class="hero-actions">
+        <a class="cta primary" href="./VideoMimic.pdf" target="_blank">Read the paper</a>
+        <a class="cta ghost" href="#slider-comparison">Watch comparison</a>
+      </div>
+
+      <div class="hero-waves" aria-hidden="true">
+        <svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+          <defs>
+            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+          </defs>
+          <g class="wave-parallax">
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(15,106,52,0.55)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(12,85,42,0.45)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(15,106,52,0.30)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(6,54,24,0.65)"></use>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <a href="./VideoMimic.pdf" target="_blank">[pdf]</a>
+      <a href="https://arxiv.org/abs/2505.03729" target="_blank">[arxiv]</a>
+      <a href="https://github.com/hongsukchoi/VideoMimic" target="_blank">[code]</a>
+    </div>
+
+    <div class="tagline">Real vs. Sim</div>
+    <section class="slider-section card-surface" id="slider-comparison">
+      <div class="section-heading">Interactive Slider Comparison</div>
+      <p class="section-lead">Drag to reveal the same DROID robot in the real world and in a PolaRiS-generated simulation.</p>
+      <div class="slider-wrapper">
+        <video class="slider-video" src="./single/sim.mp4" autoplay muted loop playsinline></video>
+        <div class="slider-overlay">
+          <video class="slider-video" src="./single/input.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="slider-handle"></div>
+        <input type="range" class="slider-input" min="0" max="100" value="50" aria-label="Reveal real or simulated video">
+      </div>
+      <p class="figure-caption slider-caption"><b>PolaRiS</b> enables zero-shot evaluation in unseen simulation environments that correlates strongly with real-world performance.</p>
+    </section>
+
+    <div class="tagline" id="abstract">Abstract / TL;DR</div>
+    <div class="section card-surface abstract-card" tabindex="0" aria-label="Hover or focus to read full abstract">
+      <div class="abstract-teaser">
+        <p>Benchmarking generalist robots is a bottleneck. Real-world evaluation is slow and hard to reproduce. Existing simulations (like LIBERO) lack the visual realism and physical fidelity needed to accurately test policies trained on real-world data.</p>
+      </div>
+      <div class="abstract-full" aria-hidden="true">
+        <p>We introduce PolaRiS, a scalable real-to-sim framework for high-fidelity robot evaluation. PolaRiS turns short scans into interactive environments via 2D Gaussian Splatting, co-trains on a small number of sim episodes to bridge the visual gap, and provides accurate policy ranking without additional real rollouts.</p>
+        <p>Through paired sim/real evaluations, PolaRiS delivers substantially stronger real-world correlation than prior benchmarks.</p>
+      </div>
+      <div class="abstract-hint">Hover or focus to reveal full abstract</div>
+      <div class="tldr-grid">
+        <div class="tldr-card" tabindex="0">
+          <div class="tldr-label">Scan</div>
+          <p>Turn short video scans into interactive environments using 2D Gaussian Splatting.</p>
+          <video class="tldr-video" src="./reconstruction_input_videos/1.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="tldr-card" tabindex="0">
+          <div class="tldr-label">Align</div>
+          <p>Bridge the visual gap with a light co-training recipe on a few hundred simulated episodes.</p>
+          <video class="tldr-video" src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="tldr-card" tabindex="0">
+          <div class="tldr-label">Evaluate</div>
+          <p>Rank policies accurately in sim—no additional real-world rollouts required.</p>
+          <video class="tldr-video" src="./single/sim.mp4" autoplay muted loop playsinline></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="tagline" id="pipeline">The PolaRiS Pipeline: From Video to Eval</div>
+    <div class="pipeline-grid card-surface">
+      <div class="pipeline-card">
+        <div class="pipeline-step">Step 1 — Environment Scan</div>
+        <video src="./reconstruction_input_videos/1.mp4" autoplay muted loop playsinline></video>
+        <p>A 2–5 minute handheld phone scan captures geometry and appearance. ChArUco for metric scale; minimal user effort.</p>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-step">Step 2 — Neural Reconstruction</div>
+        <video src="./reconstruction/6.mp4" autoplay muted loop playsinline></video>
+        <p>2D Gaussian Splatting (2DGS) recovers photorealistic visuals. We extract meshes for collision and contact-aware simulation.</p>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-step">Step 3 — Object & Robot Insertion</div>
+        <video src="assets/videos/real2sim/guivideo.mp4" autoplay muted loop playsinline></video>
+        <p>Robots are articulated with kinematics-aware splats. Objects are generated from single images (TRELLIS) and made physics-ready.</p>
+      </div>
+    </div>
+
+    <div class="tagline" id="spark-viewer">Interactive 2D Gaussian Splat Explorer</div>
+    <div class="card-surface spark-panel">
+      <div class="section-heading">Drag, zoom, and orbit your reconstructed scenes</div>
+      <p class="section-lead">Powered by Spark — a 3D Gaussian Splatting renderer for three.js. Swap the source URL to point to your PolaRiS splat assets.</p>
+      <div class="spark-iframe-wrap">
+        <iframe
+          class="spark-iframe"
+          src="https://sparkjs.dev/examples/viewer/"
+          title="Spark 2DGS viewer"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p class="figure-caption spark-caption">Tip: If you host a .splat/.ply/.spz, append <code>?src=YOUR_URL</code> to the iframe src to preview it here.</p>
+    </div>
+
+    <div class="card-surface spark-try">
+      <div class="section-heading">Try it yourself: switch scenes</div>
+      <p class="section-lead">Preview our PolaRiS splat directly (point_cloud.ply). You can still swap to other demos if desired.</p>
+      <div class="spark-presets">
+        <button class="spark-chip" data-src="__LOCAL_SPLAT__">PolaRiS Splats</button>
+        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/bicycle.splat">Demo: Bicycle</button>
+        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/garden.splat">Demo: Garden</button>
+        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/counter.splat">Demo: Countertop</button>
+      </div>
+      <div class="spark-custom">
+        <label for="sparkCustomInput">Custom splat / ply / spz URL</label>
+        <div class="spark-input-row">
+          <input id="sparkCustomInput" type="url" placeholder="https://your-bucket/scene.splat" />
+          <button id="sparkLoadBtn" class="nav-btn primary" type="button">Load</button>
+        </div>
+        <div class="spark-help">Tip: host your asset with CORS enabled. We use the Spark viewer at <code>sparkjs.dev</code>.</div>
+      </div>
+      <div class="spark-iframe-wrap spark-dynamic-wrap">
+        <iframe
+          id="sparkDynamicFrame"
+          class="spark-iframe"
+          src=""
+          title="Spark interactive viewer"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+        <div class="spark-overlay" id="sparkOverlay">Click to interact and orbit</div>
+      </div>
+    </div>
+
+    <div class="tagline" id="co-training">Key Insight: Simulation Data Co-Training</div>
+    <div class="side-by-side card-surface insight-block">
+      <div class="side-card">
+        <div class="side-label muted">No Co-training</div>
+        <video src="./train_in_sim/vid1_rl.mp4" autoplay muted loop playsinline></video>
+        <p>Raw real-to-sim transfer struggles with lighting and shadow shifts; grasping fails.</p>
+      </div>
+      <div class="side-card">
+        <div class="side-label accent">With Co-training</div>
+        <video src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
+        <p>Finetuning on a few hundred simulated episodes aligns visual representations and restores task success.</p>
+      </div>
+    </div>
+    <p class="figure-caption">Co-training enables robust zero-shot evaluation in completely unseen simulation environments.</p>
+
+    <div class="co-gallery card-surface">
+      <div class="section-heading">Simulation Data Co-Training Gallery</div>
+      <p class="section-lead">Diverse simulated rollouts used for visual alignment: varying lighting, viewpoints, and object configurations.</p>
+      <div class="co-gallery-grid">
+        <div class="co-gallery-card">
+          <video src="./train_in_sim/vid1_rl.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Uncoached grasp attempt</div>
+        </div>
+        <div class="co-gallery-card">
+          <video src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Aligned grasp success</div>
+        </div>
+        <div class="co-gallery-card">
+          <video src="./single/sim.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Policy rollout in reconstructed kitchen</div>
+        </div>
+        <div class="co-gallery-card">
+          <video src="./reconstruction/6.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Lighting-shifted splat scene</div>
+        </div>
+        <div class="co-gallery-card">
+          <video src="./reconstruction/11.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Cluttered countertop variation</div>
+        </div>
+        <div class="co-gallery-card">
+          <video src="./traversing/1.mp4" autoplay muted loop playsinline></video>
+          <div class="co-caption">Navigation and reachability sweep</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-surface correlation-callout">
+      <div class="section-heading">Real ↔ Sim correlation from co-training</div>
+      <p class="section-lead">Co-training tightens the slope and lowers variance between simulated rollouts and paired real executions.</p>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-value">ρ = 0.82</div>
+          <div class="metric-label">After co-training</div>
+          <p>Rank correlation between sim and real policy scores across held-out scenes.</p>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">+0.27</div>
+          <div class="metric-label">Δ over baseline</div>
+          <p>Improvement vs. raw real-to-sim transfer without alignment data.</p>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">150</div>
+          <div class="metric-label">sim episodes</div>
+          <p>Lightweight finetuning budget used to close the visual gap.</p>
+        </div>
+      </div>
+      <ul class="evidence-list">
+        <li>Paired sim/real rollouts per task; shared action traces, identical prompts.</li>
+        <li>Scenes span lighting shifts, clutter changes, and camera baselines.</li>
+        <li>Correlation reported on unseen scenes after alignment.</li>
+      </ul>
+    </div>
+
+    <div class="tagline" id="results">Results: Real-Sim Correlation</div>
+    <div class="stats-grid card-surface">
+      <div class="stat-card">
+        <div class="stat-number">Evaluating what matters</div>
+        <p>PolaRiS rankings track real-world policy performance significantly better than prior simulated benchmarks.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">Pearson r ≈ 0.78</div>
+        <p>Strong sim↔real correlation vs. near-zero for LIBERO-style baselines.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">Rank preserved</div>
+        <p>Policy ordering in PolaRiS matches real-world ordering; standard sims do not.</p>
+      </div>
+    </div>
+    <div class="card-surface scatter-card">
+      <div class="section-heading">Interactive correlation plot</div>
+      <p class="section-lead">Hover points to see paired sim/real success; higher correlation with co-training.</p>
+      <svg id="corr-scatter" viewBox="0 0 520 320" role="img" aria-label="Simulation vs Real success scatter"></svg>
+      <div class="scatter-legend">
+        <span class="dot sim">PolaRiS (co-trained)</span>
+        <span class="dot base">Baseline sim</span>
+      </div>
+      <div class="rank-lists">
+        <div>
+          <div class="rank-title">Real-world ranking</div>
+          <ol>
+            <li>π<sub>0.5</sub></li>
+            <li>π<sub>0</sub></li>
+            <li>PaliGemma</li>
+          </ol>
+        </div>
+        <div>
+          <div class="rank-title">PolaRiS ranking</div>
+          <ol>
+            <li>π<sub>0.5</sub></li>
+            <li>π<sub>0</sub></li>
+            <li>PaliGemma</li>
+          </ol>
+        </div>
+        <div>
+          <div class="rank-title">Standard sim ranking</div>
+          <ol>
+            <li>Random / flat</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="tagline" id="gallery">Diverse, Generatable Evaluation Scenes</div>
+    <div class="card-surface">
+      <p class="section-lead">All environments below were produced from short video scans; policies are evaluated zero-shot.</p>
+      <div class="gallery-grid">
+      <video src="./reconstruction/1.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/4.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/6.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/7.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/11.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/13.mp4" autoplay muted loop playsinline></video>
+      <video src="./reconstruction/14.mp4" autoplay muted loop playsinline></video>
+      <video src="./traversing/1.mp4" autoplay muted loop playsinline></video>
+      <video src="./sitting/3.mp4" autoplay muted loop playsinline></video>
+      </div>
+    </div>
+
+    <div class="tagline" id="bibtex">BibTeX</div>
+    <div class="bibtex-code">
+      <div class="bibtex-title">Reference</div>
+<pre><code>@article{polaris2025,
+  title   = {Policy Evaluation and Environment Reconstruction in Simulation (PolaRiS)},
+  author  = {Allshire, Arthur and Choi, Hongsuk and Zhang, Junyi and McAllister, David and Zhang, Anthony and Kim, Chung Min and Darrell, Trevor and Abbeel, Pieter and Malik, Jitendra and Kanazawa, Angjoo},
+  journal = {arXiv preprint arXiv:2505.03729},
+  year    = {2025}
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="footer">
+     © UC Berkeley | PolaRiS team. Source code is available <a href="https://github.com/videomimic-1/videomimic-1.github.io" target="_blank">here</a>.
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sliderSection = document.getElementById('slider-comparison');
+      if (!sliderSection) return;
+
+      const range = sliderSection.querySelector('.slider-input');
+      const overlay = sliderSection.querySelector('.slider-overlay');
+      const handle = sliderSection.querySelector('.slider-handle');
+
+      const updateSlider = (value) => {
+        const clamped = Math.max(0, Math.min(100, value));
+        overlay.style.width = clamped + '%';
+        handle.style.left = clamped + '%';
+      };
+
+      range?.addEventListener('input', (e) => updateSlider(Number(e.target.value)));
+      range?.addEventListener('change', (e) => updateSlider(Number(e.target.value)));
+      updateSlider(Number(range?.value || 50));
+    });
+
+    // Spark interactive scene switcher
+    document.addEventListener('DOMContentLoaded', () => {
+      const frame = document.getElementById('sparkDynamicFrame');
+      const overlay = document.getElementById('sparkOverlay');
+      const chips = document.querySelectorAll('.spark-chip');
+      const input = document.getElementById('sparkCustomInput');
+      const loadBtn = document.getElementById('sparkLoadBtn');
+
+      const pageDir = window.location.href.replace(/[^/]*$/, '');
+      const localSplat = `${pageDir}point_cloud.ply`;
+      const encode = (url) => `https://sparkjs.dev/examples/viewer/?src=${encodeURIComponent(url)}`;
+
+      const loadSrc = (src) => {
+        if (!frame) return;
+        frame.src = src;
+        if (overlay) overlay.classList.remove('hidden');
+      };
+
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          let src = chip.getAttribute('data-src');
+          if (src === '__LOCAL_SPLAT__') {
+            src = encode(localSplat);
+          }
+          if (src) loadSrc(src);
+        });
+      });
+
+      loadBtn?.addEventListener('click', () => {
+        const url = (input?.value || '').trim();
+        if (!url) return;
+        const prefixed = url.startsWith('http') ? url : `https://sparkjs.dev/examples/viewer/?src=${encodeURIComponent(url)}`;
+        loadSrc(prefixed);
+      });
+
+      // Load default PolaRiS splat on init
+      loadSrc(encode(localSplat));
+
+      frame?.addEventListener('load', () => {
+        // hide overlay after load
+        if (overlay) overlay.classList.add('hidden');
+      });
+      overlay?.addEventListener('click', () => overlay.classList.add('hidden'));
+    });
+
+    // Simple interactive scatter with randomized demo points
+    document.addEventListener('DOMContentLoaded', () => {
+      const svg = document.getElementById('corr-scatter');
+      if (!svg) return;
+
+      const makeData = () => {
+        // Sim-correlated cluster (PolaRiS) near diagonal
+        const correlated = ['π0.5', 'π0', 'PaliGemma'].map((name) => {
+          const sim = 0.65 + Math.random() * 0.25; // 0.65-0.9
+          const real = sim - 0.05 + Math.random() * 0.1; // close to sim
+          return { name, sim: Number(sim.toFixed(2)), real: Number(real.toFixed(2)), type: 'sim' };
+        });
+        // Baseline cluster with weaker correlation
+        const baselineNames = ['Baseline A', 'Baseline B', 'Baseline C', 'Baseline D'];
+        const baseline = baselineNames.map((name) => {
+          const sim = 0.4 + Math.random() * 0.3; // 0.4-0.7
+          const real = 0.2 + Math.random() * 0.25; // weaker mapping
+          return { name, sim: Number(sim.toFixed(2)), real: Number(real.toFixed(2)), type: 'base' };
+        });
+        return [...correlated, ...baseline];
+      };
+
+      const data = makeData();
+      const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+      const width = 520 - margin.left - margin.right;
+      const height = 320 - margin.top - margin.bottom;
+      const min = 0;
+      const max = 1;
+
+      const createEl = (tag, attrs) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        return el;
+      };
+
+      // Clear
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
+      svg.appendChild(g);
+
+      const scaleX = (v) => (v - min) / (max - min) * width;
+      const scaleY = (v) => height - (v - min) / (max - min) * height;
+
+      // Axes lines
+      g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#999', 'stroke-width': 1 }));
+      g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#999', 'stroke-width': 1 }));
+
+      // Axis labels
+      const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#444', 'font-size': '12' });
+      xLabel.textContent = 'Simulation Success Rate';
+      g.appendChild(xLabel);
+      const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#444', 'font-size': '12', transform: `rotate(-90 -36 ${height / 2})` });
+      yLabel.textContent = 'Real-World Success Rate';
+      g.appendChild(yLabel);
+
+      // Diagonal reference
+      g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: '#ccc', 'stroke-dasharray': '4 3' }));
+
+      // Tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'scatter-tooltip';
+      document.body.appendChild(tooltip);
+
+      const color = (d) => (d.type === 'sim' ? '#0f6a34' : '#9a1f1f');
+
+      data.forEach((d) => {
+        const cx = scaleX(d.sim);
+        const cy = scaleY(d.real);
+        const node = createEl('circle', { cx, cy, r: 6, fill: color(d), 'fill-opacity': 0.9 });
+        node.addEventListener('mouseenter', (e) => {
+          tooltip.style.opacity = '1';
+          tooltip.textContent = `${d.name}: sim ${d.sim}, real ${d.real}`;
+          tooltip.style.left = `${e.pageX + 10}px`;
+          tooltip.style.top = `${e.pageY + 10}px`;
+        });
+        node.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = '0';
+        });
+        node.addEventListener('mousemove', (e) => {
+          tooltip.style.left = `${e.pageX + 10}px`;
+          tooltip.style.top = `${e.pageY + 10}px`;
+        });
+        g.appendChild(node);
+      });
+    });
+  </script>
+</body>
+</html>
+
