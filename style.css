@@ -1341,6 +1341,41 @@ video.r2s-video-item {
   margin-top: 16px;
 }
 
+.scatter-flex {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.scatter-visual {
+  flex: 1 1 520px;
+}
+
+.scatter-notes {
+  flex: 1 1 260px;
+  background: #fdfaf4;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.notes-title {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.scatter-notes ul {
+  margin: 0;
+  padding-left: 16px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.5;
+}
+
 .scatter-legend {
   display: flex;
   gap: 14px;
@@ -1394,6 +1429,45 @@ video.r2s-video-item {
   opacity: 0;
   transition: opacity 0.1s ease;
   z-index: 2147483647;
+}
+
+.recharts-card {
+  margin-top: 16px;
+}
+
+.recharts-wrap {
+  width: 100%;
+}
+
+.recharts-fallback {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+}
+
+.recharts-stat {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.recharts-stat.muted {
+  background: #c8cdd6;
+  color: #111;
+}
+
+.recharts-tooltip {
+  background: #0f0f0f;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
 .correlation-callout {
   margin-top: 16px;

@@ -87,11 +87,13 @@
     <div class="tagline" id="abstract">Abstract / TL;DR</div>
     <div class="section card-surface abstract-card" tabindex="0" aria-label="Hover or focus to read full abstract">
       <div class="abstract-teaser">
-        <p>Benchmarking generalist robots is a bottleneck. Real-world evaluation is slow and hard to reproduce. Existing simulations (like LIBERO) lack the visual realism and physical fidelity needed to accurately test policies trained on real-world data.</p>
+        <p>We introduce PolaRiS, a scalable real-to-sim framework for high-fidelity robot evaluation. PolaRiS turns short scans into interactive environments via 2D Gaussian Splatting, co-trains on a small number of sim episodes to bridge the visual gap, and provides accurate policy ranking without additional real rollouts.</p>
+        <p>Through paired sim/real evaluations, PolaRiS delivers substantially stronger real-world correlation for generalist policies.</p>
       </div>
       <div class="abstract-full" aria-hidden="true">
-        <p>We introduce PolaRiS, a scalable real-to-sim framework for high-fidelity robot evaluation. PolaRiS turns short scans into interactive environments via 2D Gaussian Splatting, co-trains on a small number of sim episodes to bridge the visual gap, and provides accurate policy ranking without additional real rollouts.</p>
-        <p>Through paired sim/real evaluations, PolaRiS delivers substantially stronger real-world correlation than prior benchmarks.</p>
+        <p>A major challenge for robot learning research is our ability to accurately measure and compare the performance of robot policies. Benchmarking in robotics is historically challenging due to the stochasticity, reproducibility, and time-consuming nature of real-world rollouts. This challenge is exacerbated for recent generalist policies, which need to be evaluated across numerous scenes and tasks. Evaluation in simulation offers a scalable complement to real world evaluations, but the visual and physical domain gap between existing simulation benchmarks and the real world has made them an unreliable signal for policy improvement. Furthermore, building realistic and diverse simulated environments has traditionally required significant human effort and expertise.</p>
+        <p></p>To bridge the gap, we introduce <b>Policy Evaluation and Environment Reconstruction in Simulation (PolaRiS)</b>, a scalable real-to-sim framework for high-fidelity simulated robot evaluation. PolaRiS uses neural reconstruction methods to turn short video scans of real-world scenes into interactive simulation environments. Further, we develop a simple simulation data co-training recipe that bridges remaining real-to-sim gaps and enables zero-shot evaluation in unseen simulation environments. Through extensive paired evaluations between simulation and the real world, we demonstrate that PolaRiS evaluations provide a much stronger correlation to real world generalist policy performance than existing simulated benchmarks. Its simplicity also enables rapid creation of diverse simulated environments.</p>
+        <p>As such, this work takes a step towards distributed and democratized evaluation for the next generation of robotic foundation models.</p>
       </div>
       <div class="abstract-hint">Hover or focus to reveal full abstract</div>
       <div class="tldr-grid">
