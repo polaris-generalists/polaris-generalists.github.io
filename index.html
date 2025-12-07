@@ -132,49 +132,42 @@
       </div>
     </div>
 
-    <div class="tagline" id="spark-viewer">Interactive 2D Gaussian Splat Explorer</div>
-    <div class="card-surface spark-panel">
-      <div class="section-heading">Drag, zoom, and orbit your reconstructed scenes</div>
-      <p class="section-lead">Powered by Spark — a 3D Gaussian Splatting renderer for three.js. Swap the source URL to point to your PolaRiS splat assets.</p>
-      <div class="spark-iframe-wrap">
-        <iframe
-          class="spark-iframe"
-          src="https://sparkjs.dev/examples/viewer/"
-          title="Spark 2DGS viewer"
-          loading="lazy"
-          allowfullscreen>
-        </iframe>
-      </div>
-      <p class="figure-caption spark-caption">Tip: If you host a .splat/.ply/.spz, append <code>?src=YOUR_URL</code> to the iframe src to preview it here.</p>
-    </div>
-
-    <div class="card-surface spark-try">
-      <div class="section-heading">Try it yourself: switch scenes</div>
-      <p class="section-lead">Preview our PolaRiS splat directly (point_cloud.ply). You can still swap to other demos if desired.</p>
-      <div class="spark-presets">
-        <button class="spark-chip" data-src="__LOCAL_SPLAT__">PolaRiS Splats</button>
-        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/bicycle.splat">Demo: Bicycle</button>
-        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/garden.splat">Demo: Garden</button>
-        <button class="spark-chip" data-src="https://sparkjs.dev/examples/viewer/?src=https://huggingface.co/datasets/gsplat/datasets/resolve/main/counter.splat">Demo: Countertop</button>
-      </div>
-      <div class="spark-custom">
-        <label for="sparkCustomInput">Custom splat / ply / spz URL</label>
-        <div class="spark-input-row">
-          <input id="sparkCustomInput" type="url" placeholder="https://your-bucket/scene.splat" />
-          <button id="sparkLoadBtn" class="nav-btn primary" type="button">Load</button>
+    <div class="tagline" id="object-reconstruction">Object Reconstruction (Real → Sim)</div>
+    <div class="card-surface mesh-viewer">
+      <div class="mesh-header">
+        <div>
+          <div class="section-heading">Interact with TRELLIS reconstructions</div>
+          <p class="section-lead">Preview TRELLIS-generated object meshes; switch objects and orbit the assets.</p>
         </div>
-        <div class="spark-help">Tip: host your asset with CORS enabled. We use the Spark viewer at <code>sparkjs.dev</code>.</div>
+        <label class="mesh-selector">
+          <span>Select object</span>
+          <select id="meshSelect">
+            <option value="cleaner">Cleaner</option>
+            <option value="coke">Coke</option>
+            <option value="electricdrill">Electric Drill</option>
+            <option value="pot">Pot</option>
+            <option value="scissor">Scissor</option>
+            <option value="spoon">Spoon</option>
+          </select>
+        </label>
       </div>
-      <div class="spark-iframe-wrap spark-dynamic-wrap">
-        <iframe
-          id="sparkDynamicFrame"
-          class="spark-iframe"
-          src=""
-          title="Spark interactive viewer"
-          loading="lazy"
-          allowfullscreen>
-        </iframe>
-        <div class="spark-overlay" id="sparkOverlay">Click to interact and orbit</div>
+
+      <div class="mesh-active-label">Showing: <span id="meshActiveName">Cleaner</span></div>
+
+      <div class="mesh-columns">
+        <div class="mesh-col mesh-media">
+          <div class="mesh-col-title">Object Scan</div>
+          <video id="meshVideo" class="mesh-video" playsinline muted loop controls></video>
+          <div class="mesh-note" id="meshVideoNote"></div>
+        </div>
+        <div class="mesh-col">
+          <div class="mesh-col-title">Object Mesh</div>
+          <model-viewer id="meshRaw" class="mesh-viewer-frame" alt="TRELLIS visual mesh" loading="lazy"
+            camera-controls auto-rotate rotation-per-second="30deg" camera-orbit="auto auto 600%"
+            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 1000%" field-of-view="85deg"
+            exposure="1" shadow-intensity="0.4" src="./assets/trellis/mesh_cleaner.glb">
+          </model-viewer>
+        </div>
       </div>
     </div>
 
@@ -332,6 +325,7 @@
      © UC Berkeley | PolaRiS team. Source code is available <a href="https://github.com/videomimic-1/videomimic-1.github.io" target="_blank">here</a>.
   </div>
 
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const sliderSection = document.getElementById('slider-comparison');
@@ -352,49 +346,52 @@
       updateSlider(Number(range?.value || 50));
     });
 
-    // Spark interactive scene switcher
+
+    // TRELLIS mesh switcher
     document.addEventListener('DOMContentLoaded', () => {
-      const frame = document.getElementById('sparkDynamicFrame');
-      const overlay = document.getElementById('sparkOverlay');
-      const chips = document.querySelectorAll('.spark-chip');
-      const input = document.getElementById('sparkCustomInput');
-      const loadBtn = document.getElementById('sparkLoadBtn');
+      const select = document.getElementById('meshSelect');
+      const raw = document.getElementById('meshRaw');
+      const activeName = document.getElementById('meshActiveName');
+      const video = document.getElementById('meshVideo');
+      const note = document.getElementById('meshVideoNote');
 
-      const pageDir = window.location.href.replace(/[^/]*$/, '');
-      const localSplat = `${pageDir}point_cloud.ply`;
-      const encode = (url) => `https://sparkjs.dev/examples/viewer/?src=${encodeURIComponent(url)}`;
-
-      const loadSrc = (src) => {
-        if (!frame) return;
-        frame.src = src;
-        if (overlay) overlay.classList.remove('hidden');
+      const meshes = {
+        cleaner: { label: 'Cleaner', file: 'mesh_cleaner.glb', video: 'cleaner.mp4' },
+        coke: { label: 'Coke', file: 'mesh_coke.glb', video: null },
+        electricdrill: { label: 'Electric Drill', file: 'mesh_electricdrill.glb', video: 'electricdrill.mp4' },
+        pot: { label: 'Pot', file: 'mesh_pot.glb', video: 'pot.mp4' },
+        scissor: { label: 'Scissor', file: 'mesh_scissor.glb', video: 'scissor.mp4' },
+        spoon: { label: 'Spoon', file: 'mesh_spoon.glb', video: 'spoon.mp4' }
       };
 
-      chips.forEach((chip) => {
-        chip.addEventListener('click', () => {
-          let src = chip.getAttribute('data-src');
-          if (src === '__LOCAL_SPLAT__') {
-            src = encode(localSplat);
+      const setMesh = (key) => {
+        const entry = meshes[key];
+        if (!entry || !raw) return;
+        const src = `./assets/trellis/${entry.file}`;
+        raw.setAttribute('src', src);
+        raw.setAttribute('camera-orbit', 'auto auto 600%');
+        raw.setAttribute('min-camera-orbit', 'auto auto 200%');
+        raw.setAttribute('max-camera-orbit', 'auto auto 1000%');
+        raw.setAttribute('field-of-view', '85deg');
+        if (activeName) activeName.textContent = entry.label;
+        if (video) {
+          if (entry.video) {
+            video.src = `./assets/videos/objects/${entry.video}`;
+            video.classList.remove('hidden');
+            video.load();
+            video.play().catch(() => {});
+            if (note) note.textContent = '';
+          } else {
+            video.pause();
+            video.removeAttribute('src');
+            video.classList.add('hidden');
+            if (note) note.textContent = 'No scan video available for this object.';
           }
-          if (src) loadSrc(src);
-        });
-      });
+        }
+      };
 
-      loadBtn?.addEventListener('click', () => {
-        const url = (input?.value || '').trim();
-        if (!url) return;
-        const prefixed = url.startsWith('http') ? url : `https://sparkjs.dev/examples/viewer/?src=${encodeURIComponent(url)}`;
-        loadSrc(prefixed);
-      });
-
-      // Load default PolaRiS splat on init
-      loadSrc(encode(localSplat));
-
-      frame?.addEventListener('load', () => {
-        // hide overlay after load
-        if (overlay) overlay.classList.add('hidden');
-      });
-      overlay?.addEventListener('click', () => overlay.classList.add('hidden'));
+      select?.addEventListener('change', (e) => setMesh(e.target.value));
+      setMesh(select?.value || 'cleaner');
     });
 
     // Simple interactive scatter with randomized demo points
