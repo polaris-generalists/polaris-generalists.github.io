@@ -1518,6 +1518,14 @@ video.r2s-video-item {
   font-size: 12px;
   box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
+
+.bar-card {
+  margin-top: 16px;
+}
+
+#bar-plot {
+  width: 100%;
+}
 .correlation-callout {
   margin-top: 16px;
 }

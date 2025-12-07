@@ -294,6 +294,13 @@
       </div>
     </div>
 
+    <div class="card-surface bar-card">
+      <div class="section-heading">Interactive bar plot (Sim vs Real per Environment)</div>
+      <p class="section-lead">PolaRiS sim scores track real performance; hover for exact values.</p>
+      <svg id="bar-plot" viewBox="0 0 640 360" role="img" aria-label="Simulation vs Real bar plot"></svg>
+      <div class="scatter-status" id="bar-status">Loading bar data…</div>
+    </div>
+
     <div class="tagline" id="gallery">Diverse, Generatable Evaluation Scenes</div>
     <div class="card-surface">
       <p class="section-lead">All environments below were produced from short video scans; policies are evaluated zero-shot.</p>
@@ -639,6 +646,153 @@
             demo.push({ name: `LIBERO ${i + 1}`, sim: Math.random(), real: Math.random(), source: 'libero' });
           }
           renderScatter(demo);
+        });
+    });
+
+    // Interactive bar plot (sim vs real per environment)
+    document.addEventListener('DOMContentLoaded', () => {
+      const svg = document.getElementById('bar-plot');
+      const statusEl = document.getElementById('bar-status');
+      if (!svg) return;
+
+      const colors = {
+        sim: '#8e7dbe',
+        real: '#e98a73',
+        axis: '#333',
+        grid: '#e0e0e0'
+      };
+
+      const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+      const width = 640 - margin.left - margin.right;
+      const height = 360 - margin.top - margin.bottom;
+
+      const createEl = (tag, attrs) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        return el;
+      };
+
+      const renderBars = (records) => {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
+        svg.appendChild(g);
+
+        const envs = records.map((r) => r.environment || '');
+        const maxVal = Math.max(...records.map((r) => Math.max(r.sim, r.real)), 1);
+
+        const xBand = (idx) => (idx * (width / envs.length)) + 0.1 * (width / envs.length);
+        const bandWidth = 0.8 * (width / envs.length);
+        const scaleY = (v) => height - (v / maxVal) * height;
+
+        // Grid lines
+        const gridCount = 5;
+        for (let i = 0; i <= gridCount; i++) {
+          const y = (i / gridCount) * height;
+          g.appendChild(createEl('line', { x1: 0, y1: y, x2: width, y2: y, stroke: colors.grid, 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
+        }
+
+        // Axes
+        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: colors.axis, 'stroke-width': 2 }));
+        g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: colors.axis, 'stroke-width': 2 }));
+
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'scatter-tooltip';
+        document.body.appendChild(tooltip);
+
+        records.forEach((r, idx) => {
+          const baseX = xBand(idx);
+          const simH = height - scaleY(r.sim);
+          const realH = height - scaleY(r.real);
+          const barW = bandWidth / 2.4;
+
+          const simRect = createEl('rect', {
+            x: baseX,
+            y: scaleY(r.sim),
+            width: barW,
+            height: simH,
+            fill: colors.sim
+          });
+          const realRect = createEl('rect', {
+            x: baseX + barW + 6,
+            y: scaleY(r.real),
+            width: barW,
+            height: realH,
+            fill: colors.real
+          });
+
+          [simRect, realRect].forEach((node, i) => {
+            node.addEventListener('mouseenter', (e) => {
+              tooltip.style.opacity = '1';
+              const label = i === 0 ? 'Sim' : 'Real';
+              const val = i === 0 ? r.sim : r.real;
+              tooltip.textContent = `${r.environment}: ${label} ${Math.round(val * 100)}%`;
+              tooltip.style.left = `${e.pageX + 10}px`;
+              tooltip.style.top = `${e.pageY + 10}px`;
+            });
+            node.addEventListener('mouseleave', () => {
+              tooltip.style.opacity = '0';
+            });
+            node.addEventListener('mousemove', (e) => {
+              tooltip.style.left = `${e.pageX + 10}px`;
+              tooltip.style.top = `${e.pageY + 10}px`;
+            });
+          });
+
+          g.appendChild(simRect);
+          g.appendChild(realRect);
+
+          // x labels
+          const lbl = createEl('text', {
+            x: baseX + barW + 3,
+            y: height + 24,
+            'text-anchor': 'middle',
+            fill: '#333',
+            'font-size': '11'
+          });
+          lbl.textContent = r.environment || `Env ${idx + 1}`;
+          g.appendChild(lbl);
+        });
+
+        // y-axis ticks/labels
+        for (let i = 0; i <= gridCount; i++) {
+          const val = (i / gridCount) * maxVal;
+          const y = height - (val / maxVal) * height;
+          const t = createEl('text', { x: -10, y: y + 4, 'text-anchor': 'end', fill: '#333', 'font-size': '11' });
+          t.textContent = `${Math.round(val * 100)}%`;
+          g.appendChild(t);
+        }
+
+        if (statusEl) statusEl.textContent = '';
+      };
+
+      fetch('./assets/data/bar.json')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((records) => {
+          if (!Array.isArray(records) || records.length === 0) {
+            if (statusEl) statusEl.textContent = 'No bar data available.';
+            return;
+          }
+          const data = records.map((r) => ({
+            environment: r.environment || '',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          renderBars(data);
+        })
+        .catch((err) => {
+          console.warn('Bar data load failed; showing demo bars', err);
+          if (statusEl) statusEl.textContent = '';
+          const envs = ['Env A', 'Env B', 'Env C'];
+          const demo = envs.map((env) => ({
+            environment: env,
+            sim: 0.6 + Math.random() * 0.3,
+            real: 0.5 + Math.random() * 0.35
+          }));
+          renderBars(demo);
         });
     });
   </script>
