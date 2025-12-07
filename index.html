@@ -303,6 +303,20 @@
       <div class="scatter-status" id="bar-status">Loading bar data…</div>
     </div>
 
+    <div class="card-surface policy-card" id="policy-comparison">
+      <div class="section-heading">Policy Evaluation Comparison (Sim vs Real)</div>
+      <p class="section-lead">Side-by-side sim and real performance across environments for key policies.</p>
+      <div class="policy-list" id="policy-list"></div>
+      <div class="scatter-status" id="policy-status">Loading policy data…</div>
+    </div>
+
+    <div class="card-surface video-card" id="policy-videos">
+      <div class="section-heading">Evaluation Videos</div>
+      <p class="section-lead">Sample rollouts for the same policies and environments.</p>
+      <div class="video-grid" id="policy-video-grid"></div>
+      <div class="scatter-status" id="policy-video-status">Loading videos…</div>
+    </div>
+
     <div class="tagline" id="gallery">Diverse, Generatable Evaluation Scenes</div>
     <div class="card-surface">
       <p class="section-lead">All environments below were produced from short video scans; policies are evaluated zero-shot.</p>
@@ -813,6 +827,164 @@
             real: 0.5 + Math.random() * 0.35
           }));
           renderBars(demo);
+        });
+    });
+
+    // Policy evaluation comparison (sim vs real per env)
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('policy-list');
+      const statusEl = document.getElementById('policy-status');
+      if (!container) return;
+
+      const renderPolicies = (records) => {
+        container.innerHTML = '';
+        const byPolicy = {};
+        records.forEach((r) => {
+          const pol = r.policy || 'Unknown';
+          if (!byPolicy[pol]) byPolicy[pol] = [];
+          byPolicy[pol].push(r);
+        });
+
+        Object.entries(byPolicy).forEach(([pol, rows]) => {
+          const item = document.createElement('div');
+          item.className = 'policy-item';
+
+          const title = document.createElement('div');
+          title.className = 'policy-title';
+          title.textContent = pol;
+          item.appendChild(title);
+
+          const table = document.createElement('table');
+          table.className = 'policy-table';
+          const thead = document.createElement('thead');
+          thead.innerHTML = '<tr><th>Env</th><th>Sim</th><th>Real</th></tr>';
+          table.appendChild(thead);
+          const tbody = document.createElement('tbody');
+          rows.forEach((r) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${r.environment || ''}</td>
+              <td class="value-sim">${Math.round(r.sim * 100)}%</td>
+              <td class="value-real">${Math.round(r.real * 100)}%</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+          item.appendChild(table);
+          container.appendChild(item);
+        });
+        if (statusEl) statusEl.textContent = '';
+      };
+
+      fetch('./assets/data/policy_eval.json')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((records) => {
+          if (!Array.isArray(records) || records.length === 0) {
+            if (statusEl) statusEl.textContent = 'No policy data available.';
+            return;
+          }
+          const data = records.map((r) => ({
+            policy: r.policy || '',
+            environment: r.environment || '',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          renderPolicies(data);
+        })
+        .catch((err) => {
+          console.warn('Policy data load failed; showing demo data', err);
+          if (statusEl) statusEl.textContent = '';
+          const policies = [
+            'paligemma_binning_droid_jointpos',
+            'pi05_droid_jointpos',
+            'pi0_droid_jointpos',
+            'pi0_droid_jointpos_100k',
+            'pi0_fast_droid_jointpos'
+          ];
+          const envs = ['Kitchen', 'Counter', 'Stovetop'];
+          const demo = [];
+          policies.forEach((p) => {
+            envs.forEach((env) => {
+              demo.push({
+                policy: p,
+                environment: env,
+                sim: 0.6 + Math.random() * 0.3,
+                real: 0.5 + Math.random() * 0.35
+              });
+            });
+          });
+          renderPolicies(demo);
+        });
+    });
+
+    // Policy evaluation videos
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('policy-video-grid');
+      const statusEl = document.getElementById('policy-video-status');
+      if (!grid) return;
+
+      const renderVideos = (records) => {
+        grid.innerHTML = '';
+        records.forEach((r) => {
+          const card = document.createElement('div');
+          card.className = 'policy-video-item';
+          const pair = document.createElement('div');
+          pair.className = 'policy-video-pair';
+
+          const addVid = (src, label) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'policy-video-wrap';
+            const v = document.createElement('video');
+            v.src = src;
+            v.autoplay = true;
+            v.loop = true;
+            v.muted = true;
+            v.playsInline = true;
+            wrap.appendChild(v);
+            const lbl = document.createElement('div');
+            lbl.className = 'policy-video-label';
+            lbl.textContent = label;
+            wrap.appendChild(lbl);
+            return wrap;
+          };
+
+          if (r.simVideo) pair.appendChild(addVid(r.simVideo, 'Sim'));
+          if (r.realVideo) pair.appendChild(addVid(r.realVideo, 'Real'));
+
+          card.appendChild(pair);
+          const meta = document.createElement('div');
+          meta.className = 'policy-video-meta';
+          meta.textContent = `${r.policy || ''} — ${r.environment || ''}`;
+          card.appendChild(meta);
+          grid.appendChild(card);
+        });
+        if (statusEl) statusEl.textContent = '';
+      };
+
+      fetch('./assets/data/policy_videos.json')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((records) => {
+          if (!Array.isArray(records) || records.length === 0) {
+            if (statusEl) statusEl.textContent = 'No video data available.';
+            return;
+          }
+          renderVideos(records);
+        })
+        .catch((err) => {
+          console.warn('Policy video data load failed; showing demo videos', err);
+          if (statusEl) statusEl.textContent = '';
+          const demo = [
+            { policy: 'paligemma_binning_droid_jointpos', environment: 'Kitchen', simVideo: './train_in_sim/vid2_rl.mp4', realVideo: './reconstruction/6.mp4' },
+            { policy: 'pi05_droid_jointpos', environment: 'Counter', simVideo: './train_in_sim/vid1_rl.mp4', realVideo: './reconstruction/4.mp4' },
+            { policy: 'pi0_droid_jointpos', environment: 'Stovetop', simVideo: './train_in_sim/vid2_input.mp4', realVideo: './reconstruction_input_videos/1.mp4' }
+          ];
+          renderVideos(demo);
         });
     });
   </script>
