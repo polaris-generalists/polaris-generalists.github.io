@@ -297,7 +297,9 @@
     <div class="card-surface bar-card">
       <div class="section-heading">Interactive bar plot (Sim vs Real per Environment)</div>
       <p class="section-lead">PolaRiS sim scores track real performance; hover for exact values.</p>
-      <svg id="bar-plot" viewBox="0 0 640 360" role="img" aria-label="Simulation vs Real bar plot"></svg>
+      <div class="bar-plot-wrap">
+        <svg id="bar-plot" viewBox="0 0 640 360" role="img" aria-label="Simulation vs Real bar plot"></svg>
+      </div>
       <div class="scatter-status" id="bar-status">Loading bar data…</div>
     </div>
 
@@ -674,6 +676,16 @@
 
       const renderBars = (records) => {
         while (svg.firstChild) svg.removeChild(svg.firstChild);
+        // Define shadow filter once
+        const defs = createEl('defs', {});
+        const filter = createEl('filter', { id: 'barShadow', x: '-40%', y: '-40%', width: '180%', height: '180%' });
+        filter.innerHTML = `
+          <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.18)"/>
+          <feDropShadow dx="-2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.14)"/>
+        `;
+        defs.appendChild(filter);
+        svg.appendChild(defs);
+
         const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
         svg.appendChild(g);
 
@@ -711,14 +723,22 @@
             y: scaleY(r.sim),
             width: barW,
             height: simH,
-            fill: colors.sim
+            fill: colors.sim,
+            stroke: '#6f5faa',
+            'stroke-width': 1.5,
+            rx: 2,
+            'filter': 'url(#barShadow)'
           });
           const realRect = createEl('rect', {
             x: baseX + barW + 6,
             y: scaleY(r.real),
             width: barW,
             height: realH,
-            fill: colors.real
+            fill: colors.real,
+            stroke: '#c7705d',
+            'stroke-width': 1.5,
+            rx: 2,
+            'filter': 'url(#barShadow)'
           });
 
           [simRect, realRect].forEach((node, i) => {
