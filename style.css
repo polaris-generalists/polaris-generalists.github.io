@@ -1177,7 +1177,7 @@ video.r2s-video-item {
 
 .co-gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 14px;
   margin-top: 12px;
 }
@@ -1200,11 +1200,13 @@ video.r2s-video-item {
 
 .co-gallery-card video {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
+  height: auto;
+  /* min-height: 200px; */
+  object-fit: contain; /* respect native video aspect */
   border-radius: 10px;
   display: block;
   box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  background: #000; /* letterbox space */
 }
 
 .co-caption {
