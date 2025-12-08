@@ -134,11 +134,11 @@
       </div>
     </div>
 
-    <div class="tagline" id="object-reconstruction">Object Reconstruction (Real → Sim)</div>
+    <div class="tagline" id="object-reconstruction">Object Generation</div>
     <div class="card-surface mesh-viewer">
       <div class="mesh-header">
         <div>
-          <div class="section-heading">Interact with TRELLIS reconstructions</div>
+          <div class="section-heading">Interact with mesh generation</div>
           <p class="section-lead">Preview TRELLIS-generated object meshes; switch objects and orbit the assets.</p>
       </div>
         <label class="mesh-selector">
@@ -928,10 +928,19 @@
       if (!grid) return;
 
       const renderVideos = (records) => {
-        grid.innerHTML = '';
-        records.forEach((r) => {
+        let idx = 0;
+
+        const show = (dir) => {
+          if (!records.length) return;
+          const r = records[idx];
+          grid.innerHTML = '';
           const card = document.createElement('div');
           card.className = 'policy-video-item';
+          if (dir === 'next') card.classList.add('slide-in-right');
+          if (dir === 'prev') card.classList.add('slide-in-left');
+          card.addEventListener('animationend', () => {
+            card.classList.remove('slide-in-right', 'slide-in-left');
+          }, { once: true });
           const pair = document.createElement('div');
           pair.className = 'policy-video-pair';
 
@@ -962,7 +971,30 @@
           meta.textContent = `${r.policy || ''}${realPol} — ${r.environment || ''}`;
           card.appendChild(meta);
           grid.appendChild(card);
+        };
+
+        const controls = document.createElement('div');
+        controls.className = 'policy-video-controls';
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'gallery-nav left';
+        btnPrev.textContent = '‹';
+        const btnNext = document.createElement('button');
+        btnNext.className = 'gallery-nav right';
+        btnNext.textContent = '›';
+        controls.appendChild(btnPrev);
+        controls.appendChild(btnNext);
+        grid.parentElement.insertBefore(controls, grid.nextSibling);
+
+        btnPrev.addEventListener('click', () => {
+          idx = (idx - 1 + records.length) % records.length;
+          show('prev');
         });
+        btnNext.addEventListener('click', () => {
+          idx = (idx + 1) % records.length;
+          show('next');
+        });
+
+        show();
         if (statusEl) statusEl.textContent = '';
       };
 

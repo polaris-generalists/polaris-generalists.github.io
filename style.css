@@ -1623,9 +1623,8 @@ video.r2s-video-item {
 
 .policy-video-wrap video {
   width: 100%;
-  height: auto;
-  aspect-ratio: 43 / 32; /* matches 1720x1280 to avoid pillarboxing */
-  object-fit: cover;
+  height: 130px;        /* crop height to a fixed viewport */
+  object-fit: cover;    /* crop to fill while preserving aspect */
   border-radius: 10px;
   display: block;
   box-shadow: 0 6px 14px rgba(0,0,0,0.12);
@@ -1637,6 +1636,29 @@ video.r2s-video-item {
   font-size: 12px;
   color: #555;
 }
+
+.policy-video-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 12px auto 0;
+  width: 100%;
+  flex-wrap: nowrap; /* keep prev/next on one line */
+  white-space: nowrap;
+}
+
+/* Slide animations for policy video carousel */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-in-right { animation: slideInRight 220ms ease; }
+.slide-in-left { animation: slideInLeft 220ms ease; }
 
 .policy-video-meta {
   margin-top: 6px;
