@@ -1,0 +1,9 @@
+[
+  { "policy": "pi05_contrain-1k", "environment": "FruitBus", "simVideo": "./assets/videos/sim_rollouts/fruitbus.mp4", "realVideo": "./assets/videos/real_rollouts/fruitbus.mp4", "realPolicy": "pi05_joint_pos" },
+  { "policy": "pi05_contrain-1k", "environment": "Stack", "simVideo": "./assets/videos/sim_rollouts/stack.mp4", "realVideo": "./assets/videos/real_rollouts/stack.mp4", "realPolicy": "pi05_joint_pos" },
+  { "policy": "pi05_contrain-1k", "environment": "PanClean", "simVideo": "./assets/videos/sim_rollouts/panclean.mp4", "realVideo": "./assets/videos/real_rollouts/panclean.mp4", "realPolicy": "pi05_joint_pos" },
+  { "policy": "pi05_contrain-1k", "environment": "LatteCup", "simVideo": "./assets/videos/sim_rollouts/lattecup_sim.mp4", "realVideo": "./assets/videos/real_rollouts/lattecup.mp4", "realPolicy": "pi05_joint_pos" },
+  { "policy": "pi05_contrain-1k", "environment": "Scissor", "simVideo": "./assets/videos/sim_rollouts/scissor.mp4", "realVideo": "./assets/videos/real_rollouts/scissor.mp4", "realPolicy": "pi05_joint_pos" },
+  { "policy": "pi05_contrain-1k", "environment": "Tape", "simVideo": "./assets/videos/sim_rollouts/tape.mp4", "realVideo": "./assets/videos/real_rollouts/tape.mp4", "realPolicy": "pi05_joint_pos" }
+]
+

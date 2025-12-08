@@ -140,7 +140,7 @@
         <div>
           <div class="section-heading">Interact with TRELLIS reconstructions</div>
           <p class="section-lead">Preview TRELLIS-generated object meshes; switch objects and orbit the assets.</p>
-        </div>
+      </div>
         <label class="mesh-selector">
           <span>Select object</span>
           <select id="meshSelect">
@@ -169,7 +169,7 @@
             min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 1000%" field-of-view="85deg"
             exposure="1" shadow-intensity="0.4" src="./assets/trellis/mesh_cleaner.glb">
           </model-viewer>
-        </div>
+      </div>
       </div>
     </div>
 
@@ -265,6 +265,7 @@
       <div class="section-heading">Interactive correlation plot</div>
       <p class="section-lead">Hover points to see paired sim/real success; higher correlation with co-training.</p>
       <svg id="corr-scatter" viewBox="0 0 520 320" role="img" aria-label="Simulation vs Real success scatter"></svg>
+      <div class="scatter-hint">Tip: hover a point to see its policy, environment, and Sim/Real success. Blue squares = PolaRiS; gray circles = LIBERO.</div>
       <div class="scatter-status" id="scatter-status">Loading results…</div>
       <div class="scatter-legend" id="policy-legend"></div>
       <div class="scatter-legend" id="env-legend"></div>
@@ -439,14 +440,14 @@
       };
 
       const renderScatter = (data) => {
-        // Clear
-        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      // Clear
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-        const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
-        svg.appendChild(g);
+      const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
+      svg.appendChild(g);
 
-        const scaleX = (v) => (v - min) / (max - min) * width;
-        const scaleY = (v) => height - (v - min) / (max - min) * height;
+      const scaleX = (v) => (v - min) / (max - min) * width;
+      const scaleY = (v) => height - (v - min) / (max - min) * height;
 
         // Grid lines
         const gridCount = 5;
@@ -457,25 +458,25 @@
           g.appendChild(createEl('line', { x1: 0, y1: gy, x2: width, y2: gy, stroke: '#e0e0e0', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
         }
 
-        // Axes lines
+      // Axes lines
         g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#333', 'stroke-width': 2 }));
         g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#333', 'stroke-width': 2 }));
 
-        // Axis labels
+      // Axis labels
         const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#333', 'font-size': '12', 'font-weight': '600' });
-        xLabel.textContent = 'Simulation Success Rate';
-        g.appendChild(xLabel);
+      xLabel.textContent = 'Simulation Success Rate';
+      g.appendChild(xLabel);
         const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#333', 'font-size': '12', 'font-weight': '600', transform: `rotate(-90 -36 ${height / 2})` });
-        yLabel.textContent = 'Real-World Success Rate';
-        g.appendChild(yLabel);
+      yLabel.textContent = 'Real-World Success Rate';
+      g.appendChild(yLabel);
 
-        // Diagonal reference
+      // Diagonal reference
         g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: '#999', 'stroke-dasharray': '6 4', 'stroke-width': 2, 'stroke-opacity': 0.6 }));
 
-        // Tooltip
-        const tooltip = document.createElement('div');
-        tooltip.className = 'scatter-tooltip';
-        document.body.appendChild(tooltip);
+      // Tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'scatter-tooltip';
+      document.body.appendChild(tooltip);
 
         const polarisEnvPalette = ['#41245f', '#8326df', '#b392e0'];
         const liberoEnvPalette = ['#966f1a', '#c28426', '#E0AF67'];
@@ -497,9 +498,9 @@
         const strokeColor = (source) => (source === 'polaris' ? '#12306c' : 'rgba(130,135,145,0.9)');
         const markerForPolicy = (policy) => policyShapeMap[policy] || 'circle';
 
-        data.forEach((d) => {
-          const cx = scaleX(d.sim);
-          const cy = scaleY(d.real);
+      data.forEach((d) => {
+        const cx = scaleX(d.sim);
+        const cy = scaleY(d.real);
           const fill = envColor(d.environment || '', d.source);
           const stroke = strokeColor(d.source);
           const marker = markerForPolicy(d.policy || d.name);
@@ -564,21 +565,21 @@
               'stroke-width': baseStrokeWidth
             });
           }
-          node.addEventListener('mouseenter', (e) => {
-            tooltip.style.opacity = '1';
+        node.addEventListener('mouseenter', (e) => {
+          tooltip.style.opacity = '1';
             tooltip.textContent = `${d.policy || d.name}: Sim ${Math.round(d.sim * 100)}%, Real ${Math.round(d.real * 100)}%${d.environment ? ` | Env: ${d.environment}` : ''}`;
-            tooltip.style.left = `${e.pageX + 10}px`;
-            tooltip.style.top = `${e.pageY + 10}px`;
-          });
-          node.addEventListener('mouseleave', () => {
-            tooltip.style.opacity = '0';
-          });
-          node.addEventListener('mousemove', (e) => {
-            tooltip.style.left = `${e.pageX + 10}px`;
-            tooltip.style.top = `${e.pageY + 10}px`;
-          });
-          g.appendChild(node);
+          tooltip.style.left = `${e.pageX + 10}px`;
+          tooltip.style.top = `${e.pageY + 10}px`;
         });
+        node.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = '0';
+        });
+        node.addEventListener('mousemove', (e) => {
+          tooltip.style.left = `${e.pageX + 10}px`;
+          tooltip.style.top = `${e.pageY + 10}px`;
+        });
+        g.appendChild(node);
+      });
 
         // Legends
         if (policyLegend) {
@@ -951,13 +952,14 @@
             return wrap;
           };
 
-          if (r.simVideo) pair.appendChild(addVid(r.simVideo, 'Sim'));
-          if (r.realVideo) pair.appendChild(addVid(r.realVideo, 'Real'));
+          if (r.simVideo) pair.appendChild(addVid(r.simVideo, 'Sim (pi05_contrain-1k)'));
+          if (r.realVideo) pair.appendChild(addVid(r.realVideo, 'Real (pi05_joint_pos)'));
 
           card.appendChild(pair);
           const meta = document.createElement('div');
           meta.className = 'policy-video-meta';
-          meta.textContent = `${r.policy || ''} — ${r.environment || ''}`;
+          const realPol = r.realPolicy ? ` / Real: ${r.realPolicy}` : '';
+          meta.textContent = `${r.policy || ''}${realPol} — ${r.environment || ''}`;
           card.appendChild(meta);
           grid.appendChild(card);
         });
@@ -980,9 +982,9 @@
           console.warn('Policy video data load failed; showing demo videos', err);
           if (statusEl) statusEl.textContent = '';
           const demo = [
-            { policy: 'paligemma_binning_droid_jointpos', environment: 'Kitchen', simVideo: './train_in_sim/vid2_rl.mp4', realVideo: './reconstruction/6.mp4' },
-            { policy: 'pi05_droid_jointpos', environment: 'Counter', simVideo: './train_in_sim/vid1_rl.mp4', realVideo: './reconstruction/4.mp4' },
-            { policy: 'pi0_droid_jointpos', environment: 'Stovetop', simVideo: './train_in_sim/vid2_input.mp4', realVideo: './reconstruction_input_videos/1.mp4' }
+            { policy: 'pi05_constrain-1k', realPolicy: 'pi05_joint_pos', environment: 'FruitBus', simVideo: './assets/videos/sim_rollouts/fruitbus.mp4', realVideo: './assets/videos/real_rollouts/fruitbus.mp4' },
+            { policy: 'pi05_constrain-1k', realPolicy: 'pi05_joint_pos', environment: 'Stack', simVideo: './assets/videos/sim_rollouts/stack.mp4', realVideo: './assets/videos/real_rollouts/stack.mp4' },
+            { policy: 'pi05_constrain-1k', realPolicy: 'pi05_joint_pos', environment: 'PanClean', simVideo: './assets/videos/sim_rollouts/panclean.mp4', realVideo: './assets/videos/real_rollouts/panclean.mp4' }
           ];
           renderVideos(demo);
         });
