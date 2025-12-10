@@ -97,8 +97,18 @@
       </div>
 
       <div class="hero-actions">
-        <a class="cta primary" href="./VideoMimic.pdf" target="_blank">Read the paper</a>
-        <a class="cta ghost" href="#slider-comparison">Watch comparison</a>
+        <a class="cta primary" href="./VideoMimic.pdf" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6zm2-6h8v2H8v-2zm0-4h4v2H8v-2zm0 8h8v2H8v-2z"/>
+          </svg>
+          Read the paper
+        </a>
+        <a class="cta dark" href="https://github.com/hongsukchoi/VideoMimic" target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -3px; margin-right: 6px;">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          Code
+        </a>
       </div>
 
       <div class="hero-waves" aria-hidden="true">
@@ -114,12 +124,6 @@
           </g>
         </svg>
       </div>
-    </div>
-
-    <div class="quick-links">
-      <a href="./VideoMimic.pdf" target="_blank">[pdf]</a>
-      <a href="https://arxiv.org/abs/2505.03729" target="_blank">[arxiv]</a>
-      <a href="https://github.com/hongsukchoi/VideoMimic" target="_blank">[code]</a>
     </div>
 
     <!-- Teaser Figure -->
@@ -178,12 +182,12 @@
     <div class="pipeline-grid card-surface">
       <div class="pipeline-card">
         <div class="pipeline-step">Step 1 — Environment Scan</div>
-        <video src="./reconstruction_input_videos/1.mp4" autoplay muted loop playsinline></video>
+        <video src="./reconstruction_input_videos/environment_scan.mp4" autoplay muted loop playsinline preload="metadata"></video>
         <p>A 2–5 minute handheld phone scan captures geometry and appearance. ChArUco for metric scale; minimal user effort.</p>
       </div>
       <div class="pipeline-card">
         <div class="pipeline-step">Step 2 — Neural Reconstruction</div>
-        <video src="./reconstruction/6.mp4" autoplay muted loop playsinline></video>
+        <video src="./reconstruction/neural_reconstruction.mp4" autoplay muted loop playsinline preload="metadata"></video>
         <p>2D Gaussian Splatting (2DGS) recovers photorealistic visuals. We extract meshes for collision and contact-aware simulation.</p>
       </div>
       <div class="pipeline-card">
@@ -193,7 +197,6 @@
       </div>
     </div>
 
-    <div class="tagline" id="object-reconstruction">Object Generation</div>
     <div class="card-surface mesh-viewer">
       <div class="mesh-header">
         <div>
@@ -295,24 +298,22 @@
       <p class="section-lead">Co-training tightens the slope and lowers variance between simulated rollouts and paired real executions.</p>
       <div class="metric-grid">
         <div class="metric-card">
-          <div class="metric-value">ρ = 0.82</div>
-          <div class="metric-label">After co-training</div>
-          <p>Rank correlation between sim and real policy scores across held-out scenes.</p>
+          <div class="metric-value">+0.64</div>
+          <div class="metric-label">Pearson boost</div>
+          <p>Improvement in Pearson correlation from co-training vs. zero-shot transfer.</p>
         </div>
         <div class="metric-card">
-          <div class="metric-value">+0.27</div>
-          <div class="metric-label">Δ over baseline</div>
-          <p>Improvement vs. raw real-to-sim transfer without alignment data.</p>
+          <div class="metric-value">−0.22</div>
+          <div class="metric-label">MMRV drop</div>
+          <p>Reduction in Mean Maximum Rank Violation from co-training vs. zero-shot.</p>
         </div>
         <div class="metric-card">
-          <div class="metric-value">150</div>
+          <div class="metric-value">326</div>
           <div class="metric-label">sim episodes</div>
-          <p>Lightweight finetuning budget used to close the visual gap.</p>
+          <p>Lightweight co-training budget used to close the visual gap.</p>
         </div>
       </div>
       <ul class="evidence-list">
-        <li>Paired sim/real rollouts per task; shared action traces, identical prompts.</li>
-        <li>Scenes span lighting shifts, clutter changes, and camera baselines.</li>
         <li>Correlation reported on unseen scenes after alignment.</li>
       </ul>
     </div>
@@ -324,12 +325,12 @@
         <p>PolaRiS rankings track real-world policy performance significantly better than prior simulated benchmarks.</p>
       </div>
       <div class="stat-card">
-        <div class="stat-number">Pearson r ≈ 0.78</div>
-        <p>Strong sim↔real correlation vs. near-zero for LIBERO-style baselines.</p>
+        <div class="stat-number">Pearson r = 0.78</div>
+        <p>Strong sim↔real correlation (higher is better) vs. near-zero for LIBERO-style baselines.</p>
       </div>
       <div class="stat-card">
-        <div class="stat-number">Rank preserved</div>
-        <p>Policy ordering in PolaRiS matches real-world ordering; standard sims do not.</p>
+        <div class="stat-number">MMRV = 0.06</div>
+        <p>Mean Maximum Rank Violation (lower is better) — policy rankings closely match real-world.</p>
       </div>
     </div>
     <div class="card-surface scatter-card">
@@ -463,14 +464,24 @@
           progressLineFill.style.height = `${scrollPercent * (trackHeight - 24)}px`;
         }
 
-        // Find active section
+        // Find active section - use conservative approach to match progress bar fill
+        // Only activate a section when it's actually been scrolled to (not just approaching)
         let activeIdx = 0;
-        sections.forEach((section, idx) => {
-          const rect = section.el.getBoundingClientRect();
-          if (rect.top <= viewportHeight * 0.4) {
+        const activationThreshold = viewportHeight * 0.3; // Section must be 30% down viewport to activate
+        
+        // Iterate through sections and find the last one that has been scrolled past the threshold
+        for (let idx = 0; idx < sections.length; idx++) {
+          const rect = sections[idx].el.getBoundingClientRect();
+          
+          // A section is considered "reached" when its top has scrolled past the threshold
+          // rect.top is relative to viewport (negative = scrolled past, positive = below viewport)
+          if (rect.top <= activationThreshold) {
             activeIdx = idx;
+          } else {
+            // Stop at first section that hasn't been reached yet
+            break;
           }
-        });
+        }
 
         // Update items
         progressItems.forEach((item, idx) => {
