@@ -8,25 +8,65 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="top-nav">
-    <div class="nav-brand">PolaRiS</div>
-    <div class="nav-links">
-      <a href="#slider-comparison">Real vs Sim</a>
-      <a href="#abstract">TL;DR</a>
-      <a href="#pipeline">Pipeline</a>
-      <a href="#co-training">Co-training</a>
-      <a href="#results">Results</a>
-      <a href="#gallery">Gallery</a>
-      <a href="#bibtex">BibTeX</a>
+  <!-- Progress Sidebar -->
+  <nav class="progress-sidebar" aria-label="Page progress">
+    <div class="progress-track">
+      <div class="progress-line"></div>
+      <div class="progress-line-fill"></div>
+      <div class="progress-item" data-section="hero">
+        <a href="#">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Intro</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="slider-comparison">
+        <a href="#slider-comparison">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Real vs Sim</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="abstract">
+        <a href="#abstract">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Abstract</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="pipeline">
+        <a href="#pipeline">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Pipeline</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="co-training">
+        <a href="#co-training">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Co-training</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="results">
+        <a href="#results">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Results</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="gallery">
+        <a href="#gallery">
+          <span class="progress-dot"></span>
+          <span class="progress-label">Gallery</span>
+        </a>
+      </div>
+      <div class="progress-item" data-section="bibtex">
+        <a href="#bibtex">
+          <span class="progress-dot"></span>
+          <span class="progress-label">BibTeX</span>
+        </a>
+      </div>
     </div>
-    <div class="nav-actions">
-      <a class="nav-btn primary" href="./VideoMimic.pdf" target="_blank">Paper</a>
-      <a class="nav-btn" href="https://github.com/hongsukchoi/VideoMimic" target="_blank">Code</a>
-    </div>
-  </div>
+  </nav>
 
   <div class="main-content">
     <div class="hero-flow">
+      <div class="hero-orb" aria-hidden="true"></div>
       <div class="hero-text">PolaRiS</div>
       <div class="sub-hero-text">Scalable Real-to-Sim Evaluations for Generalist Robot Policies</div>
 
@@ -39,7 +79,7 @@
       <div class="authors">
          <a href="https://arhanjain.github.io/" target="_blank">Arhan Jain*</a>, 
          <a href="https://robo-alex.github.io/" target="_blank">Mingtong Zhang*</a>, 
-         <a href="" target="_blank">Kanav Arora</a>, 
+         <a href="https://www.linkedin.com/in/kanav1arora/" target="_blank">Kanav Arora</a>, 
          <a href="https://verityw.github.io/" target="_blank">William Chen</a>,
          <a href="https://marceltorne.github.io/" target="_blank">Marcel Torne</a>,<br>
          <a href="https://zubairirshad.com/" target="_blank">Muhammad Zubair Irshad</a>, 
@@ -67,10 +107,10 @@
             <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
           </defs>
           <g class="wave-parallax">
-            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,184,74,0.5)"></use>
-            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(217,45,255,0.4)"></use>
-            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(85,168,255,0.35)"></use>
-            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(46,139,255,0.5)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(212,148,10,0.25)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(147,51,234,0.2)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(59,130,246,0.18)"></use>
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(37,99,235,0.25)"></use>
           </g>
         </svg>
       </div>
@@ -396,6 +436,60 @@
 
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <script>
+    // Progress Sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+      const progressItems = document.querySelectorAll('.progress-item');
+      const progressLineFill = document.querySelector('.progress-line-fill');
+      const sections = [
+        { id: 'hero', el: document.querySelector('.hero-flow') },
+        { id: 'slider-comparison', el: document.getElementById('slider-comparison') },
+        { id: 'abstract', el: document.getElementById('abstract') },
+        { id: 'pipeline', el: document.getElementById('pipeline') },
+        { id: 'co-training', el: document.getElementById('co-training') },
+        { id: 'results', el: document.getElementById('results') },
+        { id: 'gallery', el: document.getElementById('gallery') },
+        { id: 'bibtex', el: document.getElementById('bibtex') }
+      ].filter(s => s.el);
+
+      const updateProgress = () => {
+        const scrollY = window.scrollY;
+        const viewportHeight = window.innerHeight;
+        const docHeight = document.documentElement.scrollHeight - viewportHeight;
+        const scrollPercent = scrollY / docHeight;
+
+        // Update progress line fill
+        if (progressLineFill) {
+          const trackHeight = document.querySelector('.progress-track')?.offsetHeight || 0;
+          progressLineFill.style.height = `${scrollPercent * (trackHeight - 24)}px`;
+        }
+
+        // Find active section
+        let activeIdx = 0;
+        sections.forEach((section, idx) => {
+          const rect = section.el.getBoundingClientRect();
+          if (rect.top <= viewportHeight * 0.4) {
+            activeIdx = idx;
+          }
+        });
+
+        // Update items
+        progressItems.forEach((item, idx) => {
+          const sectionId = item.dataset.section;
+          const sectionIdx = sections.findIndex(s => s.id === sectionId);
+
+          item.classList.remove('active', 'passed');
+          if (sectionIdx === activeIdx) {
+            item.classList.add('active');
+          } else if (sectionIdx < activeIdx) {
+            item.classList.add('passed');
+          }
+        });
+      };
+
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       const sliderSection = document.getElementById('slider-comparison');
       if (!sliderSection) return;
@@ -498,32 +592,32 @@
         for (let i = 1; i < gridCount; i++) {
           const gx = (i / gridCount) * width;
           const gy = (i / gridCount) * height;
-          g.appendChild(createEl('line', { x1: gx, y1: 0, x2: gx, y2: height, stroke: 'rgba(255,255,255,0.06)', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
-          g.appendChild(createEl('line', { x1: 0, y1: gy, x2: width, y2: gy, stroke: 'rgba(255,255,255,0.06)', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
+          g.appendChild(createEl('line', { x1: gx, y1: 0, x2: gx, y2: height, stroke: 'rgba(0,0,0,0.06)', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
+          g.appendChild(createEl('line', { x1: 0, y1: gy, x2: width, y2: gy, stroke: 'rgba(0,0,0,0.06)', 'stroke-width': 1, 'stroke-dasharray': '4 4' }));
         }
 
       // Axes lines
-        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#6b7a94', 'stroke-width': 2 }));
-        g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#6b7a94', 'stroke-width': 2 }));
+        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: height, stroke: '#9ca3af', 'stroke-width': 2 }));
+        g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: '#9ca3af', 'stroke-width': 2 }));
 
       // Axis labels
-        const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#a1adc4', 'font-size': '11', 'font-weight': '500' });
+        const xLabel = createEl('text', { x: width / 2, y: height + 32, 'text-anchor': 'middle', fill: '#4a4a4a', 'font-size': '11', 'font-weight': '500' });
       xLabel.textContent = 'Simulation Success Rate';
       g.appendChild(xLabel);
-        const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#a1adc4', 'font-size': '11', 'font-weight': '500', transform: `rotate(-90 -36 ${height / 2})` });
+        const yLabel = createEl('text', { x: -36, y: height / 2, 'text-anchor': 'middle', fill: '#4a4a4a', 'font-size': '11', 'font-weight': '500', transform: `rotate(-90 -36 ${height / 2})` });
       yLabel.textContent = 'Real-World Success Rate';
       g.appendChild(yLabel);
 
       // Diagonal reference
-        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: 'rgba(255,184,74,0.35)', 'stroke-dasharray': '8 6', 'stroke-width': 2, 'stroke-opacity': 1 }));
+        g.appendChild(createEl('line', { x1: 0, y1: height, x2: width, y2: 0, stroke: 'rgba(212,148,10,0.4)', 'stroke-dasharray': '8 6', 'stroke-width': 2, 'stroke-opacity': 1 }));
 
       // Tooltip
       const tooltip = document.createElement('div');
       tooltip.className = 'scatter-tooltip';
       document.body.appendChild(tooltip);
 
-        const polarisEnvPalette = ['#ffb84a', '#d92dff', '#2e8bff'];
-        const liberoEnvPalette = ['#6b7a94', '#8899ad', '#a1adc4'];
+        const polarisEnvPalette = ['#d4940a', '#9333ea', '#2563eb'];
+        const liberoEnvPalette = ['#6b7280', '#9ca3af', '#d1d5db'];
         const policyMarkerPool = ['circle', 'square', 'triangle', 'diamond', 'circle'];
         const policyShapeMap = {};
 
@@ -539,7 +633,7 @@
           const idx = Math.abs(env.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length;
           return palette[idx];
         };
-        const strokeColor = (source) => (source === 'polaris' ? 'rgba(255,184,74,0.7)' : 'rgba(107,122,148,0.8)');
+        const strokeColor = (source) => (source === 'polaris' ? 'rgba(212,148,10,0.7)' : 'rgba(107,114,128,0.6)');
         const markerForPolicy = (policy) => policyShapeMap[policy] || 'circle';
 
       data.forEach((d) => {
@@ -628,7 +722,7 @@
         // Legends
         if (policyLegend) {
           policyLegend.innerHTML = '';
-          const legendColor = '#ffb84a';
+          const legendColor = '#d4940a';
           uniquePolicies.forEach((pol) => {
             const shape = markerForPolicy(pol);
             const item = document.createElement('span');
@@ -717,10 +811,10 @@
       if (!svg) return;
 
       const colors = {
-        sim: '#b44cff',
-        real: '#ffb84a',
-        axis: '#6b7a94',
-        grid: 'rgba(255,255,255,0.06)'
+        sim: '#9333ea',
+        real: '#d4940a',
+        axis: '#9ca3af',
+        grid: 'rgba(0,0,0,0.06)'
       };
 
       const margin = { top: 20, right: 20, bottom: 60, left: 60 };
@@ -783,7 +877,7 @@
             width: barW,
             height: simH,
             fill: colors.sim,
-            stroke: '#d92dff',
+            stroke: '#7c3aed',
             'stroke-width': 1.5,
             rx: 6,
             'filter': 'url(#barShadow)'
@@ -794,7 +888,7 @@
             width: barW,
             height: realH,
             fill: colors.real,
-            stroke: '#e5a235',
+            stroke: '#b57d0a',
             'stroke-width': 1.5,
             rx: 6,
             'filter': 'url(#barShadow)'
@@ -826,7 +920,7 @@
             x: baseX + barW + 3,
             y: height + 24,
             'text-anchor': 'middle',
-            fill: '#a1adc4',
+            fill: '#4a4a4a',
             'font-size': '10'
           });
           lbl.textContent = r.environment || `Env ${idx + 1}`;
@@ -837,7 +931,7 @@
         for (let i = 0; i <= gridCount; i++) {
           const val = (i / gridCount) * maxVal;
           const y = height - (val / maxVal) * height;
-          const t = createEl('text', { x: -10, y: y + 4, 'text-anchor': 'end', fill: '#a1adc4', 'font-size': '10' });
+          const t = createEl('text', { x: -10, y: y + 4, 'text-anchor': 'end', fill: '#4a4a4a', 'font-size': '10' });
           t.textContent = `${Math.round(val * 100)}%`;
           g.appendChild(t);
         }
