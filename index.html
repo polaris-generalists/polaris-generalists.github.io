@@ -49,12 +49,14 @@
           <span class="progress-label">Results</span>
         </a>
       </div>
+      <!-- Commented out - gallery section hidden
       <div class="progress-item" data-section="gallery">
         <a href="#gallery">
           <span class="progress-dot"></span>
           <span class="progress-label">Gallery</span>
         </a>
       </div>
+      -->
       <div class="progress-item" data-section="bibtex">
         <a href="#bibtex">
           <span class="progress-dot"></span>
@@ -103,7 +105,7 @@
           </svg>
           Read the paper
         </a>
-        <a class="cta dark" href="https://github.com/hongsukchoi/VideoMimic" target="_blank">
+        <a class="cta dark" href="https://github.com/arhanjain/PolaRiS/tree/main" target="_blank">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -3px; margin-right: 6px;">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
           </svg>
@@ -135,14 +137,23 @@
     <div class="tagline">Real vs. Sim</div>
     <section class="slider-section card-surface" id="slider-comparison">
       <div class="section-heading">Interactive Slider Comparison</div>
-      <p class="section-lead">Drag to reveal the same DROID robot in the real world and in a PolaRiS-generated simulation.</p>
+      <p class="section-lead">Drag to reveal sim vs real. Use arrows to switch tasks.</p>
+      <div class="slider-task-selector">
+        <button class="slider-nav-btn" id="slider-prev">‹</button>
+        <span class="slider-task-name" id="slider-task-name">Food Bussing</span>
+        <button class="slider-nav-btn" id="slider-next">›</button>
+      </div>
       <div class="slider-wrapper">
-        <video class="slider-video" src="./single/sim.mp4" autoplay muted loop playsinline></video>
+        <video class="slider-video" id="slider-sim-video" src="./assets/videos/sim_rollouts/fruitbus.mp4" autoplay muted loop playsinline></video>
         <div class="slider-overlay">
-          <video class="slider-video" src="./single/input.mp4" autoplay muted loop playsinline></video>
+          <video class="slider-video" id="slider-real-video" src="./assets/videos/real_rollouts/fruitbus.mp4" autoplay muted loop playsinline></video>
         </div>
         <div class="slider-handle"></div>
         <input type="range" class="slider-input" min="0" max="100" value="50" aria-label="Reveal real or simulated video">
+        <div class="slider-labels">
+          <span class="slider-label-real">Real</span>
+          <span class="slider-label-sim">Sim</span>
+        </div>
       </div>
       <p class="figure-caption slider-caption"><b>PolaRiS</b> enables zero-shot evaluation in unseen simulation environments that correlates strongly with real-world performance.</p>
     </section>
@@ -163,16 +174,19 @@
         <div class="tldr-card" tabindex="0">
           <div class="tldr-label">Scan</div>
           <p>Turn short video scans into interactive environments using 2D Gaussian Splatting.</p>
+          place holder for the blender scan video
           <video class="tldr-video" src="./reconstruction_input_videos/1.mp4" autoplay muted loop playsinline></video>
         </div>
         <div class="tldr-card" tabindex="0">
           <div class="tldr-label">Align</div>
           <p>Bridge the visual gap with a light co-training recipe on a few hundred simulated episodes.</p>
+          place holder, idk what to put here yet
           <video class="tldr-video" src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
         </div>
         <div class="tldr-card" tabindex="0">
           <div class="tldr-label">Evaluate</div>
           <p>Rank policies accurately in sim—no additional real-world rollouts required.</p>
+          placeholder, policy ranking
           <video class="tldr-video" src="./single/sim.mp4" autoplay muted loop playsinline></video>
         </div>
       </div>
@@ -319,9 +333,10 @@
       </ul>
     </div>
 
-    <div class="tagline" id="results">Results: Real-Sim Correlation</div>
+    <div class="tagline" id="results">Results: Real-Sim Correlation, Policy Evaluation, and Ablations</div>
+    <p class="section-note" style="text-align: center; color: var(--text-muted); font-size: 13px; margin: -8px 0 16px 0;">All performance metrics are based on normalized task progress scores, with 20 rollouts in real and 50 rollouts in sim per policy-task pair.</p>
     <div class="card-surface scatter-card">
-      <div class="section-heading">Interactive correlation plot</div>
+      <div class="section-heading">Correlation plot</div>
       <p class="section-lead">Hover points to see paired sim/real success; higher correlation with co-training.</p>
       <div class="stats-grid-inline">
         <div class="stat-card">
@@ -341,10 +356,16 @@
     </div>
 
     <div class="card-surface bar-card">
-      <div class="section-heading">Interactive bar plot (Sim vs Real per Environment)</div>
-      <p class="section-lead">PolaRiS sim scores track real performance; hover for exact values.</p>
+      <div class="section-heading">Bar plot (Sim vs Real per Policy)</div>
+      <p class="section-lead">PolaRiS sim scores track real performance per policy; hover for exact values.</p>
+      <div style="margin-bottom: 12px;">
+        <label for="bar-env-select" style="font-size: 13px; color: var(--text-secondary); margin-right: 8px;">Filter by task:</label>
+        <select id="bar-env-select" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-elevated); font-size: 13px; cursor: pointer;">
+          <option value="all">All Tasks</option>
+        </select>
+      </div>
       <div class="bar-plot-wrap">
-        <svg id="bar-plot" viewBox="0 0 640 360" role="img" aria-label="Simulation vs Real bar plot"></svg>
+        <svg id="bar-plot" viewBox="0 0 700 360" role="img" aria-label="Simulation vs Real bar plot"></svg>
       </div>
       <div class="scatter-status" id="bar-status">Loading bar data…</div>
     </div>
@@ -363,6 +384,7 @@
       <div class="scatter-status" id="policy-video-status">Loading videos…</div>
     </div>
 
+    <!-- Commented out for now - may revisit later
     <div class="tagline" id="gallery">Diverse, Generatable Evaluation Scenes</div>
     <div class="card-surface">
       <p class="section-lead">All environments below were produced from short video scans; policies are evaluated zero-shot.</p>
@@ -378,17 +400,28 @@
       <video src="./sitting/3.mp4" autoplay muted loop playsinline></video>
       </div>
     </div>
+    -->
 
-    <div class="tagline" id="visual-fidelity">Visual Fidelity Ablation</div>
-    <div class="card-surface">
-      <p class="section-lead">
-        Visual fidelity variants of the same scenes: Gaussian splatting (ours), ray traced, untextured environment, and untextured everything.
-      </p>
-      <div class="gallery-grid">
-        <video src="./assets/videos/vidual_fidelity/splats.mp4" autoplay muted loop playsinline></video>
-        <video src="./assets/videos/vidual_fidelity/raytraced.mp4" autoplay muted loop playsinline></video>
-        <video src="./assets/videos/vidual_fidelity/untextured_env.mp4" autoplay muted loop playsinline></video>
-        <video src="./assets/videos/vidual_fidelity/untextured_everything.mp4" autoplay muted loop playsinline></video>
+    <div class="card-surface" id="visual-fidelity" style="margin-top: 32px;">
+      <div class="section-heading">Visual Fidelity Ablation</div>
+      <p class="section-lead">Visual fidelity variants of the same scene.</p>
+      <div class="gallery-grid gallery-grid-labeled">
+        <div class="gallery-item">
+          <video src="./assets/videos/vidual_fidelity/splats.mp4" autoplay muted loop playsinline></video>
+          <div class="gallery-label">PolaRiS Rollout (Ours)</div>
+        </div>
+        <div class="gallery-item">
+          <video src="./assets/videos/vidual_fidelity/raytraced.mp4" autoplay muted loop playsinline></video>
+          <div class="gallery-label">Raytraced</div>
+        </div>
+        <div class="gallery-item">
+          <video src="./assets/videos/vidual_fidelity/untextured_env.mp4" autoplay muted loop playsinline></video>
+          <div class="gallery-label">Untextured Background</div>
+        </div>
+        <div class="gallery-item">
+          <video src="./assets/videos/vidual_fidelity/untextured_everything.mp4" autoplay muted loop playsinline></video>
+          <div class="gallery-label">Untextured Everything</div>
+        </div>
       </div>
     </div>
 
@@ -481,16 +514,57 @@
       const range = sliderSection.querySelector('.slider-input');
       const overlay = sliderSection.querySelector('.slider-overlay');
       const handle = sliderSection.querySelector('.slider-handle');
+      const simVideo = document.getElementById('slider-sim-video');
+      const realVideo = document.getElementById('slider-real-video');
+      const taskName = document.getElementById('slider-task-name');
+      const prevBtn = document.getElementById('slider-prev');
+      const nextBtn = document.getElementById('slider-next');
+
+      const videoPairs = [
+        { task: 'Food Bussing', sim: './assets/videos/sim_rollouts/fruitbus.mp4', real: './assets/videos/real_rollouts/fruitbus.mp4' },
+        { task: 'Block Stacking', sim: './assets/videos/sim_rollouts/stack.mp4', real: './assets/videos/real_rollouts/stack.mp4' },
+        { task: 'Pan Cleaning', sim: './assets/videos/sim_rollouts/panclean.mp4', real: './assets/videos/real_rollouts/panclean.mp4' },
+        { task: 'Latte Cup', sim: './assets/videos/sim_rollouts/lattecup_sim.mp4', real: './assets/videos/real_rollouts/lattecup.mp4' },
+        { task: 'Scissor', sim: './assets/videos/sim_rollouts/scissor.mp4', real: './assets/videos/real_rollouts/scissor.mp4' },
+        { task: 'Tape', sim: './assets/videos/sim_rollouts/tape.mp4', real: './assets/videos/real_rollouts/tape.mp4' },
+      ];
+
+      let currentIdx = 0;
+
+      const updateVideos = () => {
+        const pair = videoPairs[currentIdx];
+        simVideo.src = pair.sim;
+        realVideo.src = pair.real;
+        taskName.textContent = pair.task;
+        simVideo.play();
+        realVideo.play();
+      };
+
+      prevBtn?.addEventListener('click', () => {
+        currentIdx = (currentIdx - 1 + videoPairs.length) % videoPairs.length;
+        updateVideos();
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        currentIdx = (currentIdx + 1) % videoPairs.length;
+        updateVideos();
+      });
 
       const updateSlider = (value) => {
         const clamped = Math.max(0, Math.min(100, value));
         overlay.style.width = clamped + '%';
         handle.style.left = clamped + '%';
+        // Keep overlay video at full wrapper width
+        const wrapperWidth = sliderSection.querySelector('.slider-wrapper').offsetWidth;
+        realVideo.style.width = wrapperWidth + 'px';
       };
 
       range?.addEventListener('input', (e) => updateSlider(Number(e.target.value)));
       range?.addEventListener('change', (e) => updateSlider(Number(e.target.value)));
       updateSlider(Number(range?.value || 50));
+      
+      // Update on resize
+      window.addEventListener('resize', () => updateSlider(Number(range?.value || 50)));
     });
 
 
@@ -603,7 +677,7 @@
         // Colors matching site scheme (honey-bronze, hyper-magenta, blue-energy)
         const envColorMap = {
           'Block Stacking': '#2e8bff',   // Blue Energy
-          'Fruit Bussing': '#d4940a',    // Honey Bronze (gold)
+          'Food Bussing': '#d4940a',     // Honey Bronze (gold)
           'Pan Cleaning': '#9333ea',     // Hyper Magenta (purple)
         };
         const liberoColor = '#7a7a7a';  // Muted gray for LIBERO
@@ -777,10 +851,11 @@
         });
     });
 
-    // Interactive bar plot (sim vs real per environment)
+    // Interactive bar plot (sim vs real per policy)
     document.addEventListener('DOMContentLoaded', () => {
       const svg = document.getElementById('bar-plot');
       const statusEl = document.getElementById('bar-status');
+      const envSelect = document.getElementById('bar-env-select');
       if (!svg) return;
 
       const colors = {
@@ -789,9 +864,17 @@
         axis: '#9ca3af',
         grid: 'rgba(0,0,0,0.06)'
       };
+      
+      const policyDisplayName = {
+        'paligemma_binning_droid_jointpos': 'PaliGemma',
+        'pi05_droid_jointpos': 'π₀.₅',
+        'pi0_droid_jointpos': 'π₀',
+        'pi0_droid_jointpos_100k': 'π₀ (100k)',
+        'pi0_fast_droid_jointpos': 'π₀-fast',
+      };
 
-      const margin = { top: 20, right: 20, bottom: 60, left: 60 };
-      const width = 640 - margin.left - margin.right;
+      const margin = { top: 20, right: 20, bottom: 80, left: 60 };
+      const width = 700 - margin.left - margin.right;
       const height = 360 - margin.top - margin.bottom;
 
       const createEl = (tag, attrs) => {
@@ -800,26 +883,46 @@
         return el;
       };
 
-      const renderBars = (records) => {
+      let allData = [];
+      let tooltip = null;
+
+      const renderBars = (records, filterEnv = 'all') => {
         while (svg.firstChild) svg.removeChild(svg.firstChild);
-        // Define shadow filter once
+        
+        // Filter by environment if needed
+        let filtered = records.filter(r => r.source === 'polaris');
+        if (filterEnv !== 'all') {
+          filtered = filtered.filter(r => r.environment === filterEnv);
+        }
+        
+        // Group by policy and average if showing all environments
+        const byPolicy = {};
+        filtered.forEach(r => {
+          const pol = r.policy;
+          if (!byPolicy[pol]) byPolicy[pol] = { sims: [], reals: [] };
+          byPolicy[pol].sims.push(r.sim);
+          byPolicy[pol].reals.push(r.real);
+        });
+        
+        const policyData = Object.entries(byPolicy).map(([policy, vals]) => ({
+          policy,
+          displayName: policyDisplayName[policy] || policy,
+          sim: vals.sims.reduce((a, b) => a + b, 0) / vals.sims.length,
+          real: vals.reals.reduce((a, b) => a + b, 0) / vals.reals.length
+        }));
+        
+        // Sort by real performance
+        policyData.sort((a, b) => b.real - a.real);
+
         const defs = createEl('defs', {});
-        const filter = createEl('filter', { id: 'barShadow', x: '-40%', y: '-40%', width: '180%', height: '180%' });
-        filter.innerHTML = `
-          <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.18)"/>
-          <feDropShadow dx="-2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.14)"/>
-        `;
-        defs.appendChild(filter);
         svg.appendChild(defs);
 
         const g = createEl('g', { transform: `translate(${margin.left},${margin.top})` });
         svg.appendChild(g);
 
-        const envs = records.map((r) => r.environment || '');
-        const maxVal = Math.max(...records.map((r) => Math.max(r.sim, r.real)), 1);
-
-        const xBand = (idx) => (idx * (width / envs.length)) + 0.1 * (width / envs.length);
-        const bandWidth = 0.8 * (width / envs.length);
+        const maxVal = 1;
+        const xBand = (idx) => (idx * (width / policyData.length)) + 0.1 * (width / policyData.length);
+        const bandWidth = 0.8 * (width / policyData.length);
         const scaleY = (v) => height - (v / maxVal) * height;
 
         // Grid lines
@@ -834,11 +937,13 @@
         g.appendChild(createEl('line', { x1: 0, y1: 0, x2: 0, y2: height, stroke: colors.axis, 'stroke-width': 2 }));
 
         // Tooltip
-        const tooltip = document.createElement('div');
-        tooltip.className = 'scatter-tooltip';
-        document.body.appendChild(tooltip);
+        if (!tooltip) {
+          tooltip = document.createElement('div');
+          tooltip.className = 'scatter-tooltip';
+          document.body.appendChild(tooltip);
+        }
 
-        records.forEach((r, idx) => {
+        policyData.forEach((r, idx) => {
           const baseX = xBand(idx);
           const simH = height - scaleY(r.sim);
           const realH = height - scaleY(r.real);
@@ -848,31 +953,28 @@
             x: baseX,
             y: scaleY(r.sim),
             width: barW,
-            height: simH,
+            height: Math.max(simH, 1),
             fill: colors.sim,
-            stroke: '#7c3aed',
-            'stroke-width': 1.5,
-            rx: 6,
-            'filter': 'url(#barShadow)'
+            'fill-opacity': 0.9,
+            rx: 4
           });
           const realRect = createEl('rect', {
             x: baseX + barW + 6,
             y: scaleY(r.real),
             width: barW,
-            height: realH,
+            height: Math.max(realH, 1),
             fill: colors.real,
-            stroke: '#b57d0a',
-            'stroke-width': 1.5,
-            rx: 6,
-            'filter': 'url(#barShadow)'
+            'fill-opacity': 0.9,
+            rx: 4
           });
 
           [simRect, realRect].forEach((node, i) => {
+            node.style.cursor = 'pointer';
             node.addEventListener('mouseenter', (e) => {
               tooltip.style.opacity = '1';
               const label = i === 0 ? 'Sim' : 'Real';
               const val = i === 0 ? r.sim : r.real;
-              tooltip.textContent = `${r.environment}: ${label} ${Math.round(val * 100)}%`;
+              tooltip.innerHTML = `<strong>${r.displayName}</strong><br>${label}: ${Math.round(val * 100)}%`;
               tooltip.style.left = `${e.pageX + 10}px`;
               tooltip.style.top = `${e.pageY + 10}px`;
             });
@@ -891,12 +993,13 @@
           // x labels
           const lbl = createEl('text', {
             x: baseX + barW + 3,
-            y: height + 24,
+            y: height + 20,
             'text-anchor': 'middle',
-            fill: '#4a4a4a',
-            'font-size': '10'
+            fill: '#1a1a1a',
+            'font-size': '12',
+            'font-weight': '500'
           });
-          lbl.textContent = r.environment || `Env ${idx + 1}`;
+          lbl.textContent = r.displayName;
           g.appendChild(lbl);
         });
 
@@ -904,41 +1007,57 @@
         for (let i = 0; i <= gridCount; i++) {
           const val = (i / gridCount) * maxVal;
           const y = height - (val / maxVal) * height;
-          const t = createEl('text', { x: -10, y: y + 4, 'text-anchor': 'end', fill: '#4a4a4a', 'font-size': '10' });
+          const t = createEl('text', { x: -10, y: y + 4, 'text-anchor': 'end', fill: '#4a4a4a', 'font-size': '11' });
           t.textContent = `${Math.round(val * 100)}%`;
           g.appendChild(t);
         }
+        
+        // Legend
+        const legendY = height + 50;
+        const simLegend = createEl('rect', { x: width / 2 - 80, y: legendY, width: 14, height: 14, fill: colors.sim, rx: 2 });
+        const simLabel = createEl('text', { x: width / 2 - 60, y: legendY + 11, fill: '#4a4a4a', 'font-size': '12' });
+        simLabel.textContent = 'Sim';
+        const realLegend = createEl('rect', { x: width / 2 + 20, y: legendY, width: 14, height: 14, fill: colors.real, rx: 2 });
+        const realLabel = createEl('text', { x: width / 2 + 40, y: legendY + 11, fill: '#4a4a4a', 'font-size': '12' });
+        realLabel.textContent = 'Real';
+        g.appendChild(simLegend);
+        g.appendChild(simLabel);
+        g.appendChild(realLegend);
+        g.appendChild(realLabel);
 
         if (statusEl) statusEl.textContent = '';
       };
 
-      fetch('./assets/data/bar.json')
+      fetch('./assets/data/correlation.json')
         .then((res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
         .then((records) => {
           if (!Array.isArray(records) || records.length === 0) {
-            if (statusEl) statusEl.textContent = 'No bar data available.';
+            if (statusEl) statusEl.textContent = 'No data available.';
             return;
           }
-          const data = records.map((r) => ({
-            environment: r.environment || '',
-            sim: Number(r.sim),
-            real: Number(r.real)
-          }));
-          renderBars(data);
+          allData = records;
+          
+          // Populate environment dropdown
+          const envs = Array.from(new Set(records.filter(r => r.source === 'polaris').map(r => r.environment)));
+          envs.forEach(env => {
+            const opt = document.createElement('option');
+            opt.value = env;
+            opt.textContent = env;
+            envSelect.appendChild(opt);
+          });
+          
+          envSelect.addEventListener('change', () => {
+            renderBars(allData, envSelect.value);
+          });
+          
+          renderBars(allData, 'all');
         })
         .catch((err) => {
-          console.warn('Bar data load failed; showing demo bars', err);
-          if (statusEl) statusEl.textContent = '';
-          const envs = ['Env A', 'Env B', 'Env C'];
-          const demo = envs.map((env) => ({
-            environment: env,
-            sim: 0.6 + Math.random() * 0.3,
-            real: 0.5 + Math.random() * 0.35
-          }));
-          renderBars(demo);
+          console.warn('Data load failed', err);
+          if (statusEl) statusEl.textContent = 'Failed to load data.';
         });
     });
 
@@ -1072,15 +1191,16 @@
             return wrap;
           };
 
-          if (r.simVideo) pair.appendChild(addVid(r.simVideo, 'Sim (pi05_contrain-1k)'));
-          if (r.realVideo) pair.appendChild(addVid(r.realVideo, 'Real (pi05_joint_pos)'));
+          if (r.simVideo) pair.appendChild(addVid(r.simVideo, 'Sim'));
+          if (r.realVideo) pair.appendChild(addVid(r.realVideo, 'Real'));
 
           card.appendChild(pair);
-          const meta = document.createElement('div');
-          meta.className = 'policy-video-meta';
-          const realPol = r.realPolicy ? ` / Real: ${r.realPolicy}` : '';
-          meta.textContent = `${r.policy || ''}${realPol} — ${r.environment || ''}`;
-          card.appendChild(meta);
+          
+          // Task name centered below videos
+          const taskLabel = document.createElement('div');
+          taskLabel.className = 'policy-video-task';
+          taskLabel.textContent = r.environment || '';
+          card.appendChild(taskLabel);
           grid.appendChild(card);
         };
 
