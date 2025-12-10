@@ -236,19 +236,6 @@
     </div>
 
     <div class="tagline" id="co-training">Key Insight: Simulation Data Co-Training</div>
-    <div class="side-by-side card-surface insight-block">
-      <div class="side-card">
-        <div class="side-label muted">No Co-training</div>
-        <video src="./train_in_sim/vid1_rl.mp4" autoplay muted loop playsinline></video>
-        <p>Raw real-to-sim transfer struggles with lighting and shadow shifts; grasping fails.</p>
-      </div>
-      <div class="side-card">
-        <div class="side-label accent">With Co-training</div>
-        <video src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
-        <p>Finetuning on a few hundred simulated episodes aligns visual representations and restores task success.</p>
-      </div>
-    </div>
-    <p class="figure-caption">Co-training enables robust zero-shot evaluation in completely unseen simulation environments.</p>
 
     <div class="co-gallery card-surface">
       <div class="section-heading">Simulation Data Co-Training Gallery</div>
@@ -296,6 +283,20 @@
     <div class="card-surface correlation-callout">
       <div class="section-heading">Real ↔ Sim correlation from co-training</div>
       <p class="section-lead">Co-training tightens the slope and lowers variance between simulated rollouts and paired real executions.</p>
+      
+      <div class="side-by-side" style="margin-bottom: 24px;">
+        <div class="side-card">
+          <div class="side-label muted">No Co-training</div>
+          <video src="./train_in_sim/vid1_rl.mp4" autoplay muted loop playsinline></video>
+          <p>Raw real-to-sim transfer struggles with lighting and shadow shifts.</p>
+        </div>
+        <div class="side-card">
+          <div class="side-label accent">With Co-training</div>
+          <video src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
+          <p>Visual alignment restores task success in simulation.</p>
+        </div>
+      </div>
+
       <div class="metric-grid">
         <div class="metric-card">
           <div class="metric-value">+0.64</div>
@@ -319,52 +320,24 @@
     </div>
 
     <div class="tagline" id="results">Results: Real-Sim Correlation</div>
-    <div class="stats-grid card-surface">
-      <div class="stat-card">
-        <div class="stat-number">Evaluating what matters</div>
-        <p>PolaRiS rankings track real-world policy performance significantly better than prior simulated benchmarks.</p>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number">Pearson r = 0.78</div>
-        <p>Strong sim↔real correlation (higher is better) vs. near-zero for LIBERO-style baselines.</p>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number">MMRV = 0.06</div>
-        <p>Mean Maximum Rank Violation (lower is better) — policy rankings closely match real-world.</p>
-      </div>
-    </div>
     <div class="card-surface scatter-card">
       <div class="section-heading">Interactive correlation plot</div>
       <p class="section-lead">Hover points to see paired sim/real success; higher correlation with co-training.</p>
+      <div class="stats-grid-inline">
+        <div class="stat-card">
+          <div class="stat-number">Pearson r = 0.78</div>
+          <p>Strong sim↔real correlation (higher is better)</p>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">MMRV = 0.06</div>
+          <p>Mean Maximum Rank Violation (lower is better)</p>
+        </div>
+      </div>
       <svg id="corr-scatter" viewBox="0 0 520 320" role="img" aria-label="Simulation vs Real success scatter"></svg>
-      <div class="scatter-hint">Tip: hover a point to see its policy, environment, and Sim/Real success. Blue squares = PolaRiS; gray circles = LIBERO.</div>
+      <div class="scatter-hint">Hover any point for details. Solid = PolaRiS, faded = LIBERO baseline.</div>
       <div class="scatter-status" id="scatter-status">Loading results…</div>
       <div class="scatter-legend" id="policy-legend"></div>
       <div class="scatter-legend" id="env-legend"></div>
-      <div class="rank-lists">
-        <div>
-          <div class="rank-title">Real-world ranking</div>
-          <ol>
-            <li>π<sub>0.5</sub></li>
-            <li>π<sub>0</sub></li>
-            <li>PaliGemma</li>
-          </ol>
-        </div>
-        <div>
-          <div class="rank-title">PolaRiS ranking</div>
-          <ol>
-            <li>π<sub>0.5</sub></li>
-            <li>π<sub>0</sub></li>
-            <li>PaliGemma</li>
-          </ol>
-        </div>
-        <div>
-          <div class="rank-title">Standard sim ranking</div>
-          <ol>
-            <li>Random / flat</li>
-          </ol>
-        </div>
-      </div>
     </div>
 
     <div class="card-surface bar-card">
@@ -627,151 +600,140 @@
       tooltip.className = 'scatter-tooltip';
       document.body.appendChild(tooltip);
 
-        const polarisEnvPalette = ['#d4940a', '#9333ea', '#2563eb'];
-        const liberoEnvPalette = ['#6b7280', '#9ca3af', '#d1d5db'];
-        const policyMarkerPool = ['circle', 'square', 'triangle', 'diamond', 'circle'];
-        const policyShapeMap = {};
-
-        // Stable shapes per policy (matches superplot idea: fixed shape per policy)
-        const uniquePolicies = Array.from(new Set(data.map((d) => d.policy || d.name)));
-        uniquePolicies.forEach((pol, idx) => {
-          policyShapeMap[pol] = policyMarkerPool[idx % policyMarkerPool.length];
-        });
-
-        const envColor = (env, source) => {
-          if (!env) return source === 'polaris' ? '#ffb84a' : 'rgba(107,122,148,0.9)';
-          const palette = source === 'polaris' ? polarisEnvPalette : liberoEnvPalette;
-          const idx = Math.abs(env.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length;
-          return palette[idx];
+        // Colors matching site scheme (honey-bronze, hyper-magenta, blue-energy)
+        const envColorMap = {
+          'Block Stacking': '#2e8bff',   // Blue Energy
+          'Fruit Bussing': '#d4940a',    // Honey Bronze (gold)
+          'Pan Cleaning': '#9333ea',     // Hyper Magenta (purple)
         };
-        const strokeColor = (source) => (source === 'polaris' ? 'rgba(212,148,10,0.7)' : 'rgba(107,114,128,0.6)');
-        const markerForPolicy = (policy) => policyShapeMap[policy] || 'circle';
+        const liberoColor = '#7a7a7a';  // Muted gray for LIBERO
+        
+        // Policy name mapping for display
+        const policyDisplayName = {
+          'paligemma_binning_droid_jointpos': 'PaliGemma',
+          'pi05_droid_jointpos': 'π₀.₅',
+          'pi0_droid_jointpos': 'π₀',
+          'pi0_droid_jointpos_100k': 'π₀ (100k)',
+          'pi0_fast_droid_jointpos': 'π₀-fast',
+        };
+        
+        // Different shapes for different policies
+        const policyShapes = {
+          'paligemma_binning_droid_jointpos': 'triangle',
+          'pi05_droid_jointpos': 'circle',
+          'pi0_droid_jointpos': 'square',
+          'pi0_droid_jointpos_100k': 'diamond',
+          'pi0_fast_droid_jointpos': 'star',
+        };
+        
+        const getEnvColor = (env, source) => {
+          if (source === 'libero') return liberoColor;
+          return envColorMap[env] || '#d4940a';
+        };
 
       data.forEach((d) => {
         const cx = scaleX(d.sim);
         const cy = scaleY(d.real);
-          const fill = envColor(d.environment || '', d.source);
-          const stroke = strokeColor(d.source);
-          const marker = markerForPolicy(d.policy || d.name);
-          let node;
-          const baseFillOpacity = d.source === 'polaris' ? 0.9 : 0.6;
-          const baseStrokeWidth = 1.5;
-          const baseSquare = 10;
-          const baseCircle = 6;
-          const baseTri = 12;
-          const baseDiamond = 10;
-          if (marker === 'square') {
-            const s = baseSquare;
-            node = createEl('rect', {
-              x: cx - s / 2,
-              y: cy - s / 2,
-              width: s,
-              height: s,
-              rx: 2,
-              fill,
-              'fill-opacity': baseFillOpacity,
-              stroke,
-              'stroke-width': baseStrokeWidth
-            });
-          } else if (marker === 'triangle') {
-            const h = baseTri;
-            const points = [
-              `${cx},${cy - h}`,
-              `${cx - h},${cy + h * 0.8}`,
-              `${cx + h},${cy + h * 0.8}`
-            ].join(' ');
-            node = createEl('polygon', {
-              points,
-              fill,
-              'fill-opacity': baseFillOpacity,
-              stroke,
-              'stroke-width': baseStrokeWidth
-            });
-          } else if (marker === 'diamond') {
-            const h = baseDiamond;
-            const points = [
-              `${cx},${cy - h}`,
-              `${cx - h},${cy}`,
-              `${cx},${cy + h}`,
-              `${cx + h},${cy}`
-            ].join(' ');
-            node = createEl('polygon', {
-              points,
-              fill,
-              'fill-opacity': baseFillOpacity,
-              stroke,
-              'stroke-width': baseStrokeWidth
-            });
-          } else {
-            // circle / default
-            node = createEl('circle', {
-              cx,
-              cy,
-              r: baseCircle,
-              fill,
-              'fill-opacity': baseFillOpacity,
-              stroke,
-              'stroke-width': baseStrokeWidth
-            });
+        const fill = getEnvColor(d.environment || '', d.source);
+        const isPolaris = d.source === 'polaris';
+        const shape = policyShapes[d.policy] || 'circle';
+        const size = 9;
+        
+        let node;
+        const fillColor = isPolaris ? fill : fill;
+        const fillOpacity = isPolaris ? 0.9 : 0.35;
+        
+        if (shape === 'circle') {
+          node = createEl('circle', {
+            cx, cy, r: size,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else if (shape === 'square') {
+          node = createEl('rect', {
+            x: cx - size, y: cy - size,
+            width: size * 2, height: size * 2,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else if (shape === 'diamond') {
+          const pts = `${cx},${cy - size * 1.2} ${cx + size},${cy} ${cx},${cy + size * 1.2} ${cx - size},${cy}`;
+          node = createEl('polygon', {
+            points: pts,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else if (shape === 'triangle') {
+          const pts = `${cx},${cy - size * 1.1} ${cx + size},${cy + size * 0.8} ${cx - size},${cy + size * 0.8}`;
+          node = createEl('polygon', {
+            points: pts,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else if (shape === 'star') {
+          // 5-point star
+          const outerR = size * 1.1;
+          const innerR = size * 0.5;
+          let pts = '';
+          for (let i = 0; i < 10; i++) {
+            const r = i % 2 === 0 ? outerR : innerR;
+            const angle = (Math.PI / 2) + (i * Math.PI / 5);
+            pts += `${cx + r * Math.cos(angle)},${cy - r * Math.sin(angle)} `;
           }
+          node = createEl('polygon', {
+            points: pts.trim(),
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        }
+        
+        node.style.cursor = 'pointer';
         node.addEventListener('mouseenter', (e) => {
           tooltip.style.opacity = '1';
-            tooltip.textContent = `${d.policy || d.name}: Sim ${Math.round(d.sim * 100)}%, Real ${Math.round(d.real * 100)}%${d.environment ? ` | Env: ${d.environment}` : ''}`;
-          tooltip.style.left = `${e.pageX + 10}px`;
-          tooltip.style.top = `${e.pageY + 10}px`;
+          const displayName = policyDisplayName[d.policy] || d.policy || d.name;
+          tooltip.innerHTML = `<strong>${displayName}</strong><br>Task: ${d.environment || 'N/A'}<br>Sim: ${Math.round(d.sim * 100)}% · Real: ${Math.round(d.real * 100)}%`;
+          tooltip.style.left = `${e.pageX + 12}px`;
+          tooltip.style.top = `${e.pageY + 12}px`;
         });
         node.addEventListener('mouseleave', () => {
           tooltip.style.opacity = '0';
         });
         node.addEventListener('mousemove', (e) => {
-          tooltip.style.left = `${e.pageX + 10}px`;
-          tooltip.style.top = `${e.pageY + 10}px`;
+          tooltip.style.left = `${e.pageX + 12}px`;
+          tooltip.style.top = `${e.pageY + 12}px`;
         });
         g.appendChild(node);
       });
 
-        // Legends
+        // Tasks legend (colors)
         if (policyLegend) {
-          policyLegend.innerHTML = '';
-          const legendColor = '#d4940a';
-          uniquePolicies.forEach((pol) => {
-            const shape = markerForPolicy(pol);
+          policyLegend.innerHTML = '<strong style="margin-right: 12px; color: #1a1a1a;">Tasks:</strong>';
+          Object.entries(envColorMap).forEach(([env, color]) => {
             const item = document.createElement('span');
             item.className = 'legend-item';
-            const shapeEl = document.createElement('span');
-            shapeEl.className = `legend-shape ${shape}`;
-            shapeEl.style.background = shape === 'triangle' ? 'transparent' : legendColor;
-            if (shape === 'triangle') shapeEl.style.borderBottomColor = legendColor;
-            shapeEl.style.borderColor = legendColor;
-            item.appendChild(shapeEl);
-            item.append(pol);
+            item.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${color};margin-right:8px;vertical-align:middle;"></span>${env}`;
             policyLegend.appendChild(item);
           });
+          // Add benchmark indicator
+          policyLegend.innerHTML += '<span style="margin-left:16px;border-left:1px solid #ddd;padding-left:16px;"><strong style="margin-right:12px;color:#1a1a1a;">Benchmark:</strong></span>';
+          const polItem = document.createElement('span');
+          polItem.className = 'legend-item';
+          polItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1a1a1a;opacity:0.9;margin-right:6px;vertical-align:middle;"></span>PolaRiS`;
+          policyLegend.appendChild(polItem);
+          const libItem = document.createElement('span');
+          libItem.className = 'legend-item';
+          libItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#7a7a7a;opacity:0.35;margin-right:6px;vertical-align:middle;"></span>LIBERO`;
+          policyLegend.appendChild(libItem);
         }
+        // Policies legend (shapes)
         if (envLegend) {
-          envLegend.innerHTML = '';
-          const polEnv = Array.from(new Set(data.filter((d) => d.source === 'polaris').map((d) => d.environment || ''))).filter(Boolean);
-          const libEnv = Array.from(new Set(data.filter((d) => d.source === 'libero').map((d) => d.environment || ''))).filter(Boolean);
-          polEnv.forEach((env) => {
+          envLegend.innerHTML = '<strong style="margin-right: 12px; color: #1a1a1a;">Policies:</strong>';
+          const shapesSVG = {
+            'circle': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><circle cx="7" cy="7" r="5" fill="#1a1a1a"/></svg>`,
+            'square': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><rect x="2" y="2" width="10" height="10" fill="#1a1a1a"/></svg>`,
+            'diamond': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,1 13,7 7,13 1,7" fill="#1a1a1a"/></svg>`,
+            'triangle': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,2 13,12 1,12" fill="#1a1a1a"/></svg>`,
+            'star': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,1 8.5,5 13,5 9.5,8 11,13 7,10 3,13 4.5,8 1,5 5.5,5" fill="#1a1a1a"/></svg>`,
+          };
+          Object.entries(policyShapes).forEach(([policy, shape]) => {
             const item = document.createElement('span');
             item.className = 'legend-item';
-            const shapeEl = document.createElement('span');
-            shapeEl.className = 'legend-shape square';
-            shapeEl.style.background = envColor(env, 'polaris');
-            shapeEl.style.borderColor = 'rgba(255,184,74,0.7)';
-            item.appendChild(shapeEl);
-            item.append(env);
-            envLegend.appendChild(item);
-          });
-          libEnv.forEach((env) => {
-            const item = document.createElement('span');
-            item.className = 'legend-item';
-            const shapeEl = document.createElement('span');
-            shapeEl.className = 'legend-shape circle';
-            shapeEl.style.background = envColor(env, 'libero');
-            shapeEl.style.borderColor = 'rgba(107,122,148,0.8)';
-            item.appendChild(shapeEl);
-            item.append(env);
+            item.innerHTML = `${shapesSVG[shape]}${policyDisplayName[policy] || policy}`;
             envLegend.appendChild(item);
           });
         }
