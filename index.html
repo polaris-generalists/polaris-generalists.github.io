@@ -298,15 +298,19 @@
       <div class="section-heading">Real ↔ Sim correlation from co-training</div>
       <p class="section-lead">Co-training tightens the slope and lowers variance between simulated rollouts and paired real executions.</p>
       
+      <ul class="evidence-list" style="margin-bottom: 20px;">
+        <li>Correlation reported on unseen scenes after alignment.</li>
+      </ul>
+
       <div class="side-by-side" style="margin-bottom: 24px;">
         <div class="side-card">
           <div class="side-label muted">No Co-training</div>
-          <video src="./train_in_sim/vid1_rl.mp4" autoplay muted loop playsinline></video>
+          <video src="./assets/videos/cotrain_comparison/before_cotraining.mp4" autoplay muted loop playsinline></video>
           <p>Raw real-to-sim transfer struggles with lighting and shadow shifts.</p>
         </div>
         <div class="side-card">
           <div class="side-label accent">With Co-training</div>
-          <video src="./train_in_sim/vid2_rl.mp4" autoplay muted loop playsinline></video>
+          <video src="./assets/videos/cotrain_comparison/after_cotraining.mp4" autoplay muted loop playsinline></video>
           <p>Visual alignment restores task success in simulation.</p>
         </div>
       </div>
@@ -328,9 +332,6 @@
           <p>Lightweight co-training budget used to close the visual gap.</p>
         </div>
       </div>
-      <ul class="evidence-list">
-        <li>Correlation reported on unseen scenes after alignment.</li>
-      </ul>
     </div>
 
     <div class="tagline" id="results">Results: Real-Sim Correlation, Policy Evaluation, and Ablations</div>
@@ -524,9 +525,9 @@
         { task: 'Food Bussing', sim: './assets/videos/sim_rollouts/fruitbus.mp4', real: './assets/videos/real_rollouts/fruitbus.mp4' },
         { task: 'Block Stacking', sim: './assets/videos/sim_rollouts/stack.mp4', real: './assets/videos/real_rollouts/stack.mp4' },
         { task: 'Pan Cleaning', sim: './assets/videos/sim_rollouts/panclean.mp4', real: './assets/videos/real_rollouts/panclean.mp4' },
-        { task: 'Latte Cup', sim: './assets/videos/sim_rollouts/lattecup_sim.mp4', real: './assets/videos/real_rollouts/lattecup.mp4' },
-        { task: 'Scissor', sim: './assets/videos/sim_rollouts/scissor.mp4', real: './assets/videos/real_rollouts/scissor.mp4' },
-        { task: 'Tape', sim: './assets/videos/sim_rollouts/tape.mp4', real: './assets/videos/real_rollouts/tape.mp4' },
+        { task: 'Move Latte Cup', sim: './assets/videos/sim_rollouts/latte-cup.mp4', real: './assets/videos/real_rollouts/lattecup.mp4' },
+        { task: 'Organize Tools', sim: './assets/videos/sim_rollouts/organize-tools.mp4', real: './assets/videos/real_rollouts/scissor.mp4' },
+        { task: 'Tape Into Container', sim: './assets/videos/sim_rollouts/tape-into-container.mp4', real: './assets/videos/real_rollouts/tape.mp4' },
       ];
 
       let currentIdx = 0;
@@ -561,10 +562,15 @@
 
       range?.addEventListener('input', (e) => updateSlider(Number(e.target.value)));
       range?.addEventListener('change', (e) => updateSlider(Number(e.target.value)));
-      updateSlider(Number(range?.value || 50));
+      
+      // Set initial width after videos load
+      const initSlider = () => updateSlider(Number(range?.value || 50));
+      initSlider();
+      realVideo.addEventListener('loadedmetadata', initSlider);
+      simVideo.addEventListener('loadedmetadata', initSlider);
       
       // Update on resize
-      window.addEventListener('resize', () => updateSlider(Number(range?.value || 50)));
+      window.addEventListener('resize', initSlider);
     });
 
 
