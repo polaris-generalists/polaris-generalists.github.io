@@ -97,9 +97,9 @@ h1, h2, h3, h4, h5, h6, .section-heading {
 
 .progress-line {
   position: absolute;
-  left: 5px;
-  top: 12px;
-  bottom: 12px;
+  left: 7px;
+  top: 22px;
+  bottom: 22px;
   width: 2px;
   background: var(--border-light);
   z-index: 0;
@@ -107,8 +107,8 @@ h1, h2, h3, h4, h5, h6, .section-heading {
 
 .progress-line-fill {
   position: absolute;
-  left: 5px;
-  top: 12px;
+  left: 7px;
+  top: 22px;
   width: 2px;
   background: var(--honey-bronze);
   z-index: 1;
@@ -121,13 +121,13 @@ h1, h2, h3, h4, h5, h6, .section-heading {
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 0;
+  gap: 14px;
+  padding: 14px 0;
 }
 
 .progress-dot {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--bg-surface);
   border: 2px solid var(--border-light);
@@ -138,7 +138,7 @@ h1, h2, h3, h4, h5, h6, .section-heading {
 .progress-item.active .progress-dot {
   background: var(--honey-bronze);
   border-color: var(--honey-bronze);
-  box-shadow: 0 0 0 4px rgba(212, 148, 10, 0.2);
+  box-shadow: 0 0 0 5px rgba(212, 148, 10, 0.2);
 }
 
 .progress-item.passed .progress-dot {
@@ -148,7 +148,7 @@ h1, h2, h3, h4, h5, h6, .section-heading {
 
 .progress-label {
   font-family: 'Fira Code', monospace;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
