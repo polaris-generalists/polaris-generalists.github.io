@@ -6,6 +6,16 @@
   <title>PolaRiS</title>
   <link rel="icon" href="./figs/logo.png" type="image/png">
   <link rel="stylesheet" href="style.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
 </head>
 <body>
   <!-- Progress Sidebar -->
@@ -315,6 +325,46 @@
         </div>
       </div>
 
+      <div class="formulas-section" style="margin-top: 32px; margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
+        <div style="margin-bottom: 28px;">
+          <h3 style="font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+            <strong>(i) Pearson correlation coefficient ($r$):</strong>
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
+            This measures the linear correlation between real and simulated performance:
+          </p>
+          <div style="background: var(--bg-elevated); padding: 20px; border-radius: 12px; border: 1px solid var(--border-subtle); margin: 12px 0; overflow-x: auto;">
+            \[
+            r(R, R_{\mathcal{S}}) = 
+            \frac{\sum_{i=1}^{N} (R_i - \bar{R})(R_{\mathcal{S}, i} - \bar{R}_{\mathcal{S}})}
+            {\sqrt{\sum_{i=1}^{N} (R_i - \bar{R})^2}\sqrt{\sum_{i=1}^{N} (R_{\mathcal{S}, i} - \bar{R}_{\mathcal{S}})^2}},
+            \]
+            <p style="margin-top: 12px; color: var(--text-muted); font-size: 12px; font-style: italic;">
+              where $\bar{R}$ and $\bar{R}_{\mathcal{S}}$ are the mean real and simulated scores.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+            <strong>(ii) Mean Maximum Rank Violation (MMRV):</strong>
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
+            This measures the average maximum rank ordering error between real and simulated performance:
+          </p>
+          <div style="background: var(--bg-elevated); padding: 20px; border-radius: 12px; border: 1px solid var(--border-subtle); margin: 12px 0; overflow-x: auto;">
+            \[
+            \mathrm{MMRV}(R, R_{\mathcal{S}}) = \frac{1}{N}\sum_{i=1}^{N} \max_{1 \le j \le N}
+            |R_i - R_j| \cdot \mathbf{1}\!\Big[
+                (R_{\mathcal{S}, i} < R_{\mathcal{S}, j}) 
+                \neq 
+                (R_i < R_j)
+            \Big].
+            \]
+          </div>
+        </div>
+      </div>
+
       <div class="metric-grid">
         <div class="metric-card">
           <div class="metric-value">+0.64</div>
@@ -331,6 +381,23 @@
           <div class="metric-label">sim episodes</div>
           <p>Lightweight co-training budget used to close the visual gap.</p>
         </div>
+      </div>
+
+      <div class="data-mix-card" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
+        <h3 style="font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+          Co-training Ablation: Data Mix Impact
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+          Increasing the proportion of simulation data in co-training improves both Pearson correlation (↑) and reduces MMRV (↓), demonstrating the effectiveness of visual alignment.
+        </p>
+        <div style="background: var(--bg-elevated); padding: 20px; border-radius: 16px; border: 1px solid var(--border-subtle);">
+          <img src="./figs/data_mix_pearson_r_and_mmrv.png" alt="Data mix ablation showing Pearson r and MMRV improvement with co-training" style="width: 100%; max-width: 800px; margin: 0 auto; display: block; border-radius: 12px; border: none; box-shadow: none;" />
+        </div>
+        <p style="margin-top: 12px; color: var(--text-muted); font-size: 12px; text-align: center; font-style: italic;">
+          Left: Pearson correlation increases with cotraining on simulation data. Right: MMRV decreases, indicating better rank preservation. Note: OOD means the simulation data
+          had no overlap with evaluation scenes, objects, or tasks. See paper for detailed on 
+          makeup of the OOD, Near Domain, and In Domain datasets. 
+        </p>
       </div>
     </div>
 
@@ -354,6 +421,34 @@
       <div class="scatter-status" id="scatter-status">Loading results…</div>
       <div class="scatter-legend" id="policy-legend"></div>
       <div class="scatter-legend" id="env-legend"></div>
+
+      <div class="roboarena-section" style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-subtle); display: flex; gap: 24px; align-items: flex-start;">
+        <div class="roboarena-left" style="flex: 1;">
+          <h4 style="font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+            RoboArena Correlation
+          </h4>
+          <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.5; margin-bottom: 12px;">
+            PolaRiS evaluation scores also correlate with policy scores from RoboArena.
+          </p>
+          <p style="color: var(--text-muted); font-size: 12px; line-height: 1.5; margin-bottom: 12px;">
+            This validates that PolaRiS rankings also align with real-world human judgments of policy progress and quality.
+          </p>
+          <div style="text-align: center;">
+            <a href="https://robo-arena.github.io/" target="_blank" style="display: inline-block; margin-bottom: 12px;">
+              <img src="./figs/roboarena-paper-fig.jpeg" alt="RoboArena paper figure" style="width: 100%; max-width: 320px; border-radius: 10px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';" />
+            </a>
+            <br>
+            <a href="https://robo-arena.github.io/" target="_blank" style="font-size: 12px; color: var(--honey-bronze); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              Learn more about RoboArena →
+            </a>
+          </div>
+        </div>
+        <div class="roboarena-right" style="flex-shrink: 0;">
+          <div style="background: var(--bg-elevated); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle); max-width: 400px;">
+            <img src="./figs/roboarena_correlation.png" alt="RoboArena correlation with PolaRiS evaluations" style="width: 100%; border-radius: 8px; border: none; box-shadow: none;" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card-surface bar-card">
@@ -424,6 +519,21 @@
           <div class="gallery-label">Untextured Everything</div>
         </div>
       </div>
+
+      <div class="visual-fidelity-results" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
+        <h3 style="font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+          Visual Fidelity Impact on Correlation
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+          Higher visual fidelity leads to stronger real-sim correlation. PolaRiS's Gaussian splatting approach achieves the best Pearson r and lowest MMRV compared to raytraced and untextured alternatives.
+        </p>
+        <div style="background: var(--bg-elevated); padding: 20px; border-radius: 16px; border: 1px solid var(--border-subtle);">
+          <img src="./figs/visual_fidelity_pearson_r_and_mmrv.png" alt="Visual fidelity ablation showing Pearson r and MMRV across rendering methods" style="width: 100%; max-width: 800px; margin: 0 auto; display: block; border-radius: 12px; border: none; box-shadow: none;" />
+        </div>
+        <p style="margin-top: 12px; color: var(--text-muted); font-size: 12px; text-align: center; font-style: italic;">
+          Left: Pearson correlation across visual fidelity levels. Right: MMRV comparison. Higher fidelity rendering improves policy evaluation accuracy.
+        </p>
+      </div>
     </div>
 
     <div class="tagline" id="bibtex">BibTeX</div>
@@ -439,7 +549,7 @@
   </div>
 
   <div class="footer">
-     © UC Berkeley | PolaRiS team. Source code is available <a href="https://github.com/videomimic-1/videomimic-1.github.io" target="_blank">here</a>.
+     © University of Washington | PolaRiS team. Source code is available <a href="https://github.com/videomimic-1/videomimic-1.github.io" target="_blank">here</a>.
   </div>
 
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -680,14 +790,6 @@
       tooltip.className = 'scatter-tooltip';
       document.body.appendChild(tooltip);
 
-        // Colors matching site scheme (honey-bronze, hyper-magenta, blue-energy)
-        const envColorMap = {
-          'Block Stacking': '#2e8bff',   // Blue Energy
-          'Food Bussing': '#d4940a',     // Honey Bronze (gold)
-          'Pan Cleaning': '#9333ea',     // Hyper Magenta (purple)
-        };
-        const liberoColor = '#7a7a7a';  // Muted gray for LIBERO
-        
         // Policy name mapping for display
         const policyDisplayName = {
           'paligemma_binning_droid_jointpos': 'PaliGemma',
@@ -697,31 +799,33 @@
           'pi0_fast_droid_jointpos': 'π₀-fast',
         };
         
-        // Different shapes for different policies
-        const policyShapes = {
-          'paligemma_binning_droid_jointpos': 'triangle',
-          'pi05_droid_jointpos': 'circle',
-          'pi0_droid_jointpos': 'square',
-          'pi0_droid_jointpos_100k': 'diamond',
-          'pi0_fast_droid_jointpos': 'star',
-        };
-        
-        const getEnvColor = (env, source) => {
-          if (source === 'libero') return liberoColor;
-          return envColorMap[env] || '#d4940a';
+        // Map marker codes from JSON to shape names
+        const markerToShape = {
+          'o': 'circle',
+          's': 'square',
+          '^': 'triangle',
+          'D': 'diamond',
+          'd': 'diamond',
+          '*': 'star',
+          'v': 'triangle-down',
+          'p': 'pentagon',
+          'h': 'circle',  // hexagon fallback
+          'H': 'circle',  // hexagon fallback
         };
 
       data.forEach((d) => {
         const cx = scaleX(d.sim);
         const cy = scaleY(d.real);
-        const fill = getEnvColor(d.environment || '', d.source);
+        // Use color from data, fallback to defaults
+        const fill = d.color || (d.source === 'polaris' ? '#d4940a' : '#7a7a7a');
         const isPolaris = d.source === 'polaris';
-        const shape = policyShapes[d.policy] || 'circle';
-        const size = 9;
+        // Use marker from data, map to shape name
+        const shape = markerToShape[d.marker] || d.marker || 'circle';
+        const size = 6;
         
         let node;
-        const fillColor = isPolaris ? fill : fill;
-        const fillOpacity = isPolaris ? 0.9 : 0.35;
+        const fillColor = fill;
+        const fillOpacity = isPolaris ? 0.9 : 0.5;
         
         if (shape === 'circle') {
           node = createEl('circle', {
@@ -760,6 +864,29 @@
             points: pts.trim(),
             fill: fillColor, 'fill-opacity': fillOpacity
           });
+        } else if (shape === 'triangle-down') {
+          const pts = `${cx},${cy + size * 1.1} ${cx + size},${cy - size * 0.8} ${cx - size},${cy - size * 0.8}`;
+          node = createEl('polygon', {
+            points: pts,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else if (shape === 'pentagon') {
+          // 5-sided polygon
+          let pts = '';
+          for (let i = 0; i < 5; i++) {
+            const angle = (Math.PI / 2) + (i * 2 * Math.PI / 5);
+            pts += `${cx + size * Math.cos(angle)},${cy - size * Math.sin(angle)} `;
+          }
+          node = createEl('polygon', {
+            points: pts.trim(),
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
+        } else {
+          // Default to circle for unknown shapes
+          node = createEl('circle', {
+            cx, cy, r: size,
+            fill: fillColor, 'fill-opacity': fillOpacity
+          });
         }
         
         node.style.cursor = 'pointer';
@@ -780,64 +907,101 @@
         g.appendChild(node);
       });
 
-        // Tasks legend (colors)
+        // Build dynamic legends from data
+        // Collect unique environments with their colors (from polaris data)
+        const envColorMap = {};
+        const policyMarkerMap = {};
+        data.forEach(d => {
+          if (d.source === 'polaris' && d.environment && d.color) {
+            if (!envColorMap[d.environment]) envColorMap[d.environment] = d.color;
+          }
+          if (d.policy && d.marker) {
+            if (!policyMarkerMap[d.policy]) policyMarkerMap[d.policy] = d.marker;
+          }
+        });
+
+        // Helper to calculate luminance from hex color (for sorting dark to light)
+        const getLuminance = (hex) => {
+          const c = hex.replace('#', '');
+          const r = parseInt(c.substr(0, 2), 16) / 255;
+          const g = parseInt(c.substr(2, 2), 16) / 255;
+          const b = parseInt(c.substr(4, 2), 16) / 255;
+          return 0.299 * r + 0.587 * g + 0.114 * b;
+        };
+
+        // Environment/Task legend (colors) - sorted dark to light
         if (policyLegend) {
           policyLegend.innerHTML = '<strong style="margin-right: 12px; color: #1a1a1a;">Tasks:</strong>';
-          Object.entries(envColorMap).forEach(([env, color]) => {
+          // Sort environments by color luminance (dark to light)
+          const sortedEnvs = Object.entries(envColorMap).sort((a, b) => getLuminance(a[1]) - getLuminance(b[1]));
+          sortedEnvs.forEach(([env, color]) => {
             const item = document.createElement('span');
             item.className = 'legend-item';
-            item.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${color};margin-right:8px;vertical-align:middle;"></span>${env}`;
+            item.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};margin-right:6px;vertical-align:middle;"></span>${env}`;
             policyLegend.appendChild(item);
           });
           // Add benchmark indicator
           policyLegend.innerHTML += '<span style="margin-left:16px;border-left:1px solid #ddd;padding-left:16px;"><strong style="margin-right:12px;color:#1a1a1a;">Benchmark:</strong></span>';
           const polItem = document.createElement('span');
           polItem.className = 'legend-item';
-          polItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1a1a1a;opacity:0.9;margin-right:6px;vertical-align:middle;"></span>PolaRiS`;
+          polItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#9333ea;opacity:0.9;margin-right:6px;vertical-align:middle;"></span>PolaRiS`;
           policyLegend.appendChild(polItem);
           const libItem = document.createElement('span');
           libItem.className = 'legend-item';
-          libItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#7a7a7a;opacity:0.35;margin-right:6px;vertical-align:middle;"></span>LIBERO`;
+          libItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#2563eb;opacity:0.5;margin-right:6px;vertical-align:middle;"></span>LIBERO`;
           policyLegend.appendChild(libItem);
         }
         // Policies legend (shapes)
         if (envLegend) {
           envLegend.innerHTML = '<strong style="margin-right: 12px; color: #1a1a1a;">Policies:</strong>';
           const shapesSVG = {
-            'circle': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><circle cx="7" cy="7" r="5" fill="#1a1a1a"/></svg>`,
-            'square': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><rect x="2" y="2" width="10" height="10" fill="#1a1a1a"/></svg>`,
-            'diamond': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,1 13,7 7,13 1,7" fill="#1a1a1a"/></svg>`,
-            'triangle': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,2 13,12 1,12" fill="#1a1a1a"/></svg>`,
-            'star': `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:6px;"><polygon points="7,1 8.5,5 13,5 9.5,8 11,13 7,10 3,13 4.5,8 1,5 5.5,5" fill="#1a1a1a"/></svg>`,
+            'o': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><circle cx="6" cy="6" r="4" fill="#1a1a1a"/></svg>`,
+            's': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><rect x="2" y="2" width="8" height="8" fill="#1a1a1a"/></svg>`,
+            'D': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,1 11,6 6,11 1,6" fill="#1a1a1a"/></svg>`,
+            '^': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,2 11,10 1,10" fill="#1a1a1a"/></svg>`,
+            '*': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,1 7.2,4.2 11,4.2 8,6.8 9.2,11 6,8.5 2.8,11 4,6.8 1,4.2 4.8,4.2" fill="#1a1a1a"/></svg>`,
+            'v': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,10 11,2 1,2" fill="#1a1a1a"/></svg>`,
+            'p': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><circle cx="6" cy="6" r="4" fill="#1a1a1a"/></svg>`,
+            'circle': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><circle cx="6" cy="6" r="4" fill="#1a1a1a"/></svg>`,
+            'square': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><rect x="2" y="2" width="8" height="8" fill="#1a1a1a"/></svg>`,
+            'diamond': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,1 11,6 6,11 1,6" fill="#1a1a1a"/></svg>`,
+            'triangle': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,2 11,10 1,10" fill="#1a1a1a"/></svg>`,
+            'star': `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:5px;"><polygon points="6,1 7.2,4.2 11,4.2 8,6.8 9.2,11 6,8.5 2.8,11 4,6.8 1,4.2 4.8,4.2" fill="#1a1a1a"/></svg>`,
           };
-          Object.entries(policyShapes).forEach(([policy, shape]) => {
+          Object.entries(policyMarkerMap).forEach(([policy, marker]) => {
             const item = document.createElement('span');
             item.className = 'legend-item';
-            item.innerHTML = `${shapesSVG[shape]}${policyDisplayName[policy] || policy}`;
+            const svg = shapesSVG[marker] || shapesSVG['o'];
+            item.innerHTML = `${svg}${policyDisplayName[policy] || policy}`;
             envLegend.appendChild(item);
           });
         }
       };
 
-      fetch('./assets/data/correlation.json')
+      fetch('./assets/data/main_correlation_data.json')
         .then((res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
-        .then((records) => {
-          if (!Array.isArray(records) || records.length === 0) {
+        .then((jsonData) => {
+          // New structure: { metrics, polaris_points, libero_points }
+          const polarisPoints = (jsonData.polaris_points || []).map(r => ({
+            ...r,
+            source: 'polaris',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          const liberoPoints = (jsonData.libero_points || []).map(r => ({
+            ...r,
+            source: 'libero',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          const data = [...polarisPoints, ...liberoPoints];
+          if (data.length === 0) {
             if (statusEl) statusEl.textContent = 'No correlation data available.';
             return;
           }
-          // Normalize fields
-          const data = records.map((r, idx) => ({
-            name: r.name || r.policy || `pt-${idx + 1}`,
-            policy: r.policy || '',
-            environment: r.environment || '',
-            sim: Number(r.sim),
-            real: Number(r.real),
-            source: r.source || 'polaris'
-          }));
           renderScatter(data);
           if (statusEl) statusEl.textContent = '';
         })
@@ -1034,13 +1198,27 @@
         if (statusEl) statusEl.textContent = '';
       };
 
-      fetch('./assets/data/correlation.json')
+      fetch('./assets/data/main_correlation_data.json')
         .then((res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
-        .then((records) => {
-          if (!Array.isArray(records) || records.length === 0) {
+        .then((jsonData) => {
+          // New structure: { metrics, polaris_points, libero_points }
+          const polarisPoints = (jsonData.polaris_points || []).map(r => ({
+            ...r,
+            source: 'polaris',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          const liberoPoints = (jsonData.libero_points || []).map(r => ({
+            ...r,
+            source: 'libero',
+            sim: Number(r.sim),
+            real: Number(r.real)
+          }));
+          const records = [...polarisPoints, ...liberoPoints];
+          if (records.length === 0) {
             if (statusEl) statusEl.textContent = 'No data available.';
             return;
           }
